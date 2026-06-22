@@ -2,7 +2,7 @@
 
 ## Description
 
-This task requires implementing a proxy pool and rotation subsystem for the google-play-scraper Node.js library. The ProxyPool class must maintain a pool of HTTP/HTTPS proxies, rotate them in round-robin order, track proxy health via failure counting, temporarily disable proxies after N consecutive failures with exponential cooldown, restore health on success, and ensure fair distribution across healthy proxies. The solution is ~85 lines in a new `lib/infra/proxyPool.js` file plus a 2-line wiring change to `index.js`. A naive approach fails because the rotation index must be modular over the healthy subset (not all proxies), the cooldown must increase exponentially on repeated failures, and health recovery must reset all failure state including the cooldown multiplier.
+This task requires implementing a proxy pool and rotation subsystem for the google-play-scraper Node.js library. The ProxyPool class must maintain a pool of HTTP/HTTPS proxies, rotate them per request, track proxy health, temporarily disable failing proxies with cooldown, restore health on success, and ensure fair distribution across healthy proxies. The task tests several interacting behaviors (rotation, failure tracking, health recovery, fairness) that must all work correctly together.
 
 ## Completion Rates
 
