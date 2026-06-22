@@ -1,0 +1,69 @@
+{
+    "schema_version": 1,
+    "created_at": "2026-06-18T23:33:43.650826Z",
+    "harbor": {},
+    "invocation": [
+        "/usr/local/bin/codimango",
+        "bench",
+        "run",
+        "-p",
+        "malokshiya_facundoolano__google-play-scraper-df5df78-v1",
+        "-a",
+        "oracle",
+        "-k",
+        "1"
+    ],
+    "n_concurrent_trials": 1,
+    "retry": {
+        "max_retries": 1,
+        "include_exceptions": [
+            "AgentInstallError",
+            "EnvironmentStartTimeoutError",
+            "AgentSetupTimeoutError"
+        ],
+        "exclude_exceptions": [
+            "RewardFileEmptyError",
+            "AgentTimeoutError",
+            "RewardFileNotFoundError",
+            "VerifierTimeoutError",
+            "VerifierOutputParseError"
+        ],
+        "wait_multiplier": 1.0,
+        "min_wait_sec": 1.0,
+        "max_wait_sec": 60.0,
+        "replay_stop_after_consecutive": 0
+    },
+    "trials": [
+        {
+            "task": {
+                "name": "malokshiya_facundoolano__google-play-scraper-df5df78-v1",
+                "type": "local",
+                "digest": "sha256:e7fa38e6d57c1793009ff5946f9f2d4ece1f56e93feb0c1601da5d99f8b684d7",
+                "path": "malokshiya_facundoolano__google-play-scraper-df5df78-v1"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "name": "oracle",
+                "model_name": "oracle",
+                "skills": [],
+                "kwargs": {},
+                "env": {},
+                "mcp_servers": []
+            },
+            "skills": [],
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "extra_docker_compose": [],
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        }
+    ]
+}

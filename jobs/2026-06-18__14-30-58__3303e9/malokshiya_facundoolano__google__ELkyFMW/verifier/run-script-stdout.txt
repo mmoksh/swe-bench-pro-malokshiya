@@ -1,0 +1,127 @@
+Running selected tests: test/test_search_fix.js
+{
+  "stats": {
+    "suites": 2,
+    "tests": 6,
+    "passes": 6,
+    "pending": 0,
+    "failures": 0,
+    "start": "2026-06-18T21:38:25.256Z",
+    "end": "2026-06-18T21:38:25.315Z",
+    "duration": 59
+  },
+  "tests": [
+    {
+      "title": "should return results when searching for a well-known app",
+      "fullTitle": "Search fix should return results when searching for a well-known app",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 37,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should return apps with valid appId and title fields",
+      "fullTitle": "Search fix should return apps with valid appId and title fields",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 6,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should return apps with valid score and pricing fields",
+      "fullTitle": "Search fix should return apps with valid score and pricing fields",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 4,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should work with country and language parameters",
+      "fullTitle": "Search fix should work with country and language parameters",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 4,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should throw when search term is missing",
+      "fullTitle": "Search validation (unchanged) should throw when search term is missing",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should reject num exceeding 250",
+      "fullTitle": "Search validation (unchanged) should reject num exceeding 250",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [],
+  "passes": [
+    {
+      "title": "should return results when searching for a well-known app",
+      "fullTitle": "Search fix should return results when searching for a well-known app",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 37,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should return apps with valid appId and title fields",
+      "fullTitle": "Search fix should return apps with valid appId and title fields",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 6,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should return apps with valid score and pricing fields",
+      "fullTitle": "Search fix should return apps with valid score and pricing fields",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 4,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should work with country and language parameters",
+      "fullTitle": "Search fix should work with country and language parameters",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 4,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should throw when search term is missing",
+      "fullTitle": "Search validation (unchanged) should throw when search term is missing",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should reject num exceeding 250",
+      "fullTitle": "Search validation (unchanged) should reject num exceeding 250",
+      "file": "/app/test/test_search_fix.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ]
+}

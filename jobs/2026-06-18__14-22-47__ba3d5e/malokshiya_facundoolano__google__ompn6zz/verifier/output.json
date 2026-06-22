@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "Search fix should return results when searching for a well-known app",
+      "status": "FAILED"
+    },
+    {
+      "name": "Search fix should return apps with valid appId and title fields",
+      "status": "FAILED"
+    },
+    {
+      "name": "Search fix should return apps with valid score and pricing fields",
+      "status": "FAILED"
+    },
+    {
+      "name": "Search fix should work with country and language parameters",
+      "status": "FAILED"
+    },
+    {
+      "name": "Suggest method (unrelated) should return search suggestions for a common term",
+      "status": "FAILED"
+    }
+  ]
+}

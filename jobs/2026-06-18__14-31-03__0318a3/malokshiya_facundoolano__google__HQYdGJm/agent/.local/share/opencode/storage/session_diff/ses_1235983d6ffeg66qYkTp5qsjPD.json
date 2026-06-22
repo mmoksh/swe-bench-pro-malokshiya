@@ -1,0 +1,122 @@
+[
+  {
+    "file": "extract_main.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst p = scriptData.parse(fs.readFileSync('/tmp/lazanda.html','utf8'));\nconst app = p['ds:4'][0][1][0][23][16];\nconsole.log('app length', app.length);\nfunction findPath(obj, target, path=[]){\n  if(obj===target) return path;\n  if(Array.isArray(obj)){\n    for(let i=0;i<obj.length;i++){\n      const res=findPath(obj[i], target, [...path,i]);\n      if(res) return res;\n    }\n  } else if(obj && typeof obj==='object'){\n    for(const k of Object.keys(obj)){\n      const res=findPath(obj[k], target, [...path,k]);\n      if(res) return res;\n    }\n  }\n  return null;\n}\nconst targets = {\n  title: 'Lazada | All Shipping On Us',\n  appId: 'com.lazada.android',\n  developer: 'Lazada Mobile',\n  icon: 'https://play-lh.googleusercontent.com/mw_NfsvKM8m6RPv8Fz2GQawCOsqWv010saMnc7zbWalMxuaA9IY8h7E0VMieLxSxAFB98NFeYqbFrXXq',\n  scoreText: '4.7',\n  url: 'https://play.google.com/store/apps/details?id=com.lazada.android'\n};\nfor(const [name,val] of Object.entries(targets)){\n  console.log(name, findPath(app, val));\n}\n",
+    "additions": 31,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "find_all_apps.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\n// search for appId pattern com.xxx\nfunction collectAppIds(obj, path=[], results=[]){\n  if(typeof obj==='string' && obj.startsWith('com.') && obj.includes('.')){\n    results.push({id:obj, path:[...path]});\n  } else if(obj && typeof obj==='object'){\n    if(Array.isArray(obj)){\n      obj.forEach((v,i)=>collectAppIds(v,[...path,i],results));\n    } else {\n      Object.entries(obj).forEach(([k,v])=>collectAppIds(v,[...path,k],results));\n    }\n  }\n  return results;\n}\nconst apps = collectAppIds(parsed);\nconsole.log(apps.slice(0,20).map(a=>a.id+' @ '+a.path.join('.')));\n// unique\nconst uniq = [...new Set(apps.map(a=>a.id))];\nconsole.log('unique', uniq);\n",
+    "additions": 22,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "find_app.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nfunction findPath(obj, target, path=[]){\n  if(typeof obj !== 'object' || obj===null) return null;\n  if(Array.isArray(obj)){\n    for(let i=0;i<obj.length;i++){\n      const v=obj[i];\n      if(v===target) return [...path,i];\n      if(typeof v==='object' && v!==null){\n        const res=findPath(v,target,[...path,i]);\n        if(res) return res;\n      }\n    }\n  } else {\n    for(const k of Object.keys(obj)){\n      const v=obj[k];\n      if(v===target) return [...path,k];\n      if(typeof v==='object' && v!==null){\n        const res=findPath(v,target,[...path,k]);\n        if(res) return res;\n      }\n    }\n  }\n  return null;\n}\nconst target='com.lazada.android';\nlet found=null;\nfor(const key of Object.keys(parsed)){\n  const res=findPath(parsed[key], target, [key]);\n  if(res){found=res; break;}\n}\nconsole.log('found path', found);\n",
+    "additions": 34,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "find_app2.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nconst path=['ds:4',0,1,0,23,16,3,12,0,0];\nlet obj=parsed;\nfor(const p of path){obj=obj[p];}\nconsole.log(obj);\n// go up\nlet parent=parsed['ds:4'][0][1][0][23][16][3];\nconsole.log(JSON.stringify(parent,null,2).slice(0,2000));\n",
+    "additions": 11,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "find_app3.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nconst appNode = parsed['ds:4'][0][1][0][23][16];\nconsole.log(JSON.stringify(appNode,null,2).slice(0,5000));\n",
+    "additions": 6,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "lib/search.js",
+    "before": "import * as R from 'ramda';\nimport url from 'url';\nimport request from './utils/request.js';\nimport { BASE_URL } from './constants.js';\nimport { processFullDetailApps, checkFinished } from './utils/processPages.js';\nimport scriptData from './utils/scriptData.js';\n\n/*\n * Make the first search request as in the browser and call `checkfinished` to\n * process the next pages.\n */\nfunction initialRequest (opts) {\n  const url = `${BASE_URL}/work/search?q=${opts.term}&hl=${opts.lang}&gl=${opts.country}&price=${opts.price}`;\n  return request(\n    Object.assign({ url }, opts.requestOptions),\n    opts.throttle\n  ).then((html) => processFirstPage(html, opts, [], INITIAL_MAPPINGS));\n}\n\nfunction extaractDeveloperId (link) {\n  return link.split('?id=')[1];\n}\n\nasync function processFirstPage (html, opts, savedApps, mappings) {\n  if (R.is(String, html)) {\n    html = scriptData.parse(html);\n  }\n\n  const appsMapping = {\n    title: [2],\n    appId: [12, 0],\n    url: {\n      path: [9, 4, 2],\n      fun: (path) => new url.URL(path, BASE_URL).toString()\n    },\n    icon: [1, 1, 0, 3, 2],\n    developer: [4, 0, 0, 0],\n    developerId: {\n      path: [4, 0, 0, 1, 4, 2],\n      fun: extaractDeveloperId\n    },\n    currency: [7, 0, 3, 2, 1, 0, 1],\n    price: {\n      path: [7, 0, 3, 2, 1, 0, 0],\n      fun: (price) => price / 1000000\n    },\n    free: {\n      path: [7, 0, 3, 2, 1, 0, 0],\n      fun: (price) => price === 0\n    },\n    summary: [4, 1, 1, 1, 1],\n    scoreText: [6, 0, 2, 1, 0],\n    score: [6, 0, 2, 1, 1]\n  };\n\n  const sections = R.path(mappings.sections, html) || [];\n  if (noResultsFound(sections)) return [];\n\n  const tokenSection = sections.filter((section) => isTokenSection(section))[0];\n  const appsSection = R.path(mappings.apps, html);\n\n  // parse each item in appsSection array\n  const processedApps = R.map(scriptData.extractor(appsMapping), appsSection);\n\n  const apps = opts.fullDetail\n    ? await processFullDetailApps(processedApps, opts)\n    : processedApps;\n  const token = R.path(SECTIONS_MAPPING.token, tokenSection);\n\n  return checkFinished(opts, [...savedApps, ...apps], token);\n}\n\nfunction isTokenSection (section) {\n  const sectionToken =\n    R.is(Array, section) && R.path(SECTIONS_MAPPING.token, section);\n  return R.is(String, sectionToken);\n}\n\nfunction noResultsFound (sections) {\n  if (sections.length === 0) {\n    return true;\n  }\n}\n\nconst INITIAL_MAPPINGS = {\n  apps: ['ds:1', 0, 1, 0, 0, 0],\n  sections: ['ds:1', 0, 1, 0, 0]\n};\n\nconst SECTIONS_MAPPING = {\n  token: [1]\n};\n\nfunction getPriceGoogleValue (value) {\n  switch (value.toLowerCase()) {\n    case 'free':\n      return 1;\n    case 'paid':\n      return 2;\n    case 'all':\n    default:\n      return 0;\n  }\n}\n\nfunction search (appData, opts) {\n  return new Promise(function (resolve, reject) {\n    if (!opts || !opts.term) {\n      throw Error('Search term missing');\n    }\n\n    if (opts.num && opts.num > 250) {\n      throw Error(\"The number of results can't exceed 250\");\n    }\n\n    opts = {\n      term: encodeURIComponent(opts.term),\n      lang: opts.lang || 'en',\n      country: opts.country || 'us',\n      num: opts.num || 20,\n      fullDetail: opts.fullDetail,\n      price: opts.price ? getPriceGoogleValue(opts.price) : 0,\n      throttle: opts.throttle,\n      cache: opts.cache,\n      requestOptions: opts.requestOptions\n    };\n\n    initialRequest(opts).then(resolve).catch(reject);\n  }).then((results) => {\n    if (opts.fullDetail) {\n      // if full detail is wanted get it from the app module\n      return Promise.all(\n        results.map((app) => appData({ ...opts, appId: app.appId }))\n      );\n    }\n    return results;\n  });\n}\n\nexport default search;\n",
+    "after": "import * as R from 'ramda';\nimport url from 'url';\nimport request from './utils/request.js';\nimport { BASE_URL } from './constants.js';\nimport { processFullDetailApps, checkFinished } from './utils/processPages.js';\nimport scriptData from './utils/scriptData.js';\n\n/*\n * Make the first search request as in the browser and call `checkfinished` to\n * process the next pages.\n */\nfunction initialRequest (opts) {\n  const url = `${BASE_URL}/store/search?c=apps&q=${opts.term}&hl=${opts.lang}&gl=${opts.country}&price=${opts.price}`;\n  return request(\n    Object.assign({ url }, opts.requestOptions),\n    opts.throttle\n  ).then((html) => processFirstPage(html, opts, [], INITIAL_MAPPINGS));\n}\n\nfunction extaractDeveloperId (link) {\n  return link.split('?id=')[1];\n}\n\nasync function processFirstPage (html, opts, savedApps, mappings) {\n  if (R.is(String, html)) {\n    html = scriptData.parse(html);\n  }\n\n  // List apps mapping (from list.js) - works for search results list\n  const listAppsMapping = {\n    title: {\n      path: [0, 3],\n      fallbackPath: [3],\n      fun: (val) => val\n    },\n    appId: {\n      path: [0, 0, 0],\n      fallbackPath: [0, 0],\n      fun: (val, parsedData) => {\n        if (typeof val === 'string' && val.length > 3 && val.includes('.')) return val;\n        // fallback manual\n        const alt = R.path([0, 0], parsedData);\n        if (typeof alt === 'string' && alt.includes('.')) return alt;\n        return val;\n      }\n    },\n    url: {\n      path: [0, 10, 4, 2],\n      fallbackPath: [10, 4, 2],\n      fun: (path) => path ? new url.URL(path, BASE_URL).toString() : undefined\n    },\n    icon: {\n      path: [0, 1, 3, 2],\n      fallbackPath: [1, 3, 2],\n      fun: (val) => val\n    },\n    developer: {\n      path: [0, 14],\n      fallbackPath: [14],\n      fun: (val) => val\n    },\n    developerId: {\n      path: [0, 14],\n      fallbackPath: [14],\n      fun: (val) => val ? String(val).replace(/ /g, '+') : undefined\n    },\n    currency: {\n      path: [0, 8, 1, 0, 1],\n      fallbackPath: [8, 1, 0, 1],\n      fun: (val) => val || 'USD'\n    },\n    price: {\n      path: [0, 8, 1, 0, 0],\n      fallbackPath: [8, 1, 0, 0],\n      fun: (price) => price ? price / 1000000 : 0\n    },\n    free: {\n      path: [0, 8, 1, 0, 0],\n      fallbackPath: [8, 1, 0, 0],\n      fun: (price) => !price || price === 0\n    },\n    summary: {\n      path: [0, 13, 1],\n      fallbackPath: [13, 1],\n      fun: (val) => val || ''\n    },\n    scoreText: {\n      path: [0, 4, 0],\n      fallbackPath: [4, 0],\n      fun: (val) => val\n    },\n    score: {\n      path: [0, 4, 1],\n      fallbackPath: [4, 1],\n      fun: (val) => val\n    }\n  };\n\n  // Main app mapping for the featured search result\n  const mainAppMapping = {\n    title: [2, 0, 0],\n    appId: {\n      path: [3, '12', 0, 0],\n      fun: (val) => val\n    },\n    url: {\n      path: [2, 41, 0, 2],\n      fun: (path) => path ? new url.URL(path, BASE_URL).toString() : undefined\n    },\n    icon: [2, 95, 0, 3, 2],\n    developer: [2, 68, 0],\n    developerId: {\n      path: [2, 68, 1, 4, 2],\n      fun: extaractDeveloperId\n    },\n    summary: {\n      path: [2, 73, 0, 1],\n      fun: (val) => val || ''\n    },\n    scoreText: [2, 51, 0, 0],\n    score: [2, 51, 0, 1],\n    free: {\n      path: [],\n      fun: () => true\n    },\n    price: {\n      path: [],\n      fun: () => 0\n    },\n    currency: {\n      path: [],\n      fun: () => 'USD'\n    }\n  };\n\n  // Try to extract list apps - try multiple possible paths\n  const possibleAppPaths = [\n    ['ds:4', 0, 1, 1, 22, 0],\n    ['ds:4', 0, 1, 0, 22, 0],\n    ['ds:4', 0, 1, 0, 23, 0],\n  ];\n  let appsSection = [];\n  for (const path of possibleAppPaths) {\n    const section = R.path(path, html);\n    if (Array.isArray(section) && section.length) {\n      appsSection = section;\n      break;\n    }\n  }\n\n  // Fallback: deep search for app-like structures\n  if (!appsSection.length) {\n    const findAllApps = (obj, acc = []) => {\n      if (!obj || typeof obj !== 'object') return acc;\n      if (Array.isArray(obj) && obj.length > 0) {\n        // Check if this looks like an apps array\n        const first = obj[0];\n        if (Array.isArray(first) && first[0] && Array.isArray(first[0]) && typeof first[0][0] === 'string' && first[0][0].startsWith('com.')) {\n          acc.push(...obj);\n          return acc;\n        }\n        // Recurse\n        for (const item of obj) {\n          findAllApps(item, acc);\n        }\n      } else if (typeof obj === 'object') {\n        for (const key of Object.keys(obj)) {\n          findAllApps(obj[key], acc);\n        }\n      }\n      return acc;\n    };\n    appsSection = findAllApps(html) || [];\n  }\n\n  let processedApps = [];\n  if (Array.isArray(appsSection) && appsSection.length) {\n    processedApps = R.map(scriptData.extractor(listAppsMapping), appsSection);\n  }\n\n  // Try to extract main featured app\n  const mainAppPaths = [\n    ['ds:4', 0, 1, 0, 23, 16],\n    ['ds:4', 0, 1, 1, 23, 16],\n    ['ds:4', 0, 1, 0, 22, 16],\n    ['ds:4', 0, 1, 1, 22, 16],\n    ['ds:4', 0, 1, 0, 22, 0, 0], // fallback?\n    ['ds:4', 0, 1, 1, 22, 0, 0]\n  ];\n  for (const mainPath of mainAppPaths) {\n    const mainAppData = R.path(mainPath, html);\n    if (mainAppData) {\n      try {\n        const mainApp = scriptData.extractor(mainAppMapping)(mainAppData);\n        if (mainApp && mainApp.appId) {\n          // Prepend main app if not already in list\n          if (!processedApps.find(a => a.appId === mainApp.appId)) {\n            processedApps.unshift(mainApp);\n          }\n          break;\n        }\n      } catch (e) {\n        // ignore main app parse errors\n      }\n    }\n  }\n\n  // Fallback: if no apps found, return empty\n  if (!processedApps.length) {\n    return [];\n  }\n\n  const apps = opts.fullDetail\n    ? await processFullDetailApps(processedApps, opts)\n    : processedApps;\n\n  // Simple pagination handling - just return up to num results\n  // TODO: implement proper token-based pagination if needed\n  return apps.slice(0, opts.num);\n}\n\nfunction isTokenSection (section) {\n  return false;\n}\n\nfunction noResultsFound (sections) {\n  return false;\n}\n\nconst INITIAL_MAPPINGS = {\n  apps: ['ds:4', 0, 1, 1, 22, 0],\n  sections: ['ds:4', 0, 1, 1, 22, 0]\n};\n\nconst SECTIONS_MAPPING = {\n  token: [1]\n};\n\nfunction getPriceGoogleValue (value) {\n  switch (value.toLowerCase()) {\n    case 'free':\n      return 1;\n    case 'paid':\n      return 2;\n    case 'all':\n    default:\n      return 0;\n  }\n}\n\nfunction search (appData, opts) {\n  return new Promise(function (resolve, reject) {\n    if (!opts || !opts.term) {\n      throw Error('Search term missing');\n    }\n\n    if (opts.num && opts.num > 250) {\n      throw Error(\"The number of results can't exceed 250\");\n    }\n\n    opts = {\n      term: encodeURIComponent(opts.term),\n      lang: opts.lang || 'en',\n      country: opts.country || 'us',\n      num: opts.num || 20,\n      fullDetail: opts.fullDetail,\n      price: opts.price ? getPriceGoogleValue(opts.price) : 0,\n      throttle: opts.throttle,\n      cache: opts.cache,\n      requestOptions: opts.requestOptions\n    };\n\n    initialRequest(opts).then(resolve).catch(reject);\n  }).then((results) => {\n    if (opts.fullDetail) {\n      // if full detail is wanted get it from the app module\n      return Promise.all(\n        results.map((app) => appData({ ...opts, appId: app.appId }))\n      );\n    }\n    return results;\n  });\n}\n\nexport default search;\n",
+    "additions": 179,
+    "deletions": 34,
+    "status": "modified"
+  },
+  {
+    "file": "test_ds4.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nconsole.log(JSON.stringify(parsed['ds:4'], null,2).slice(0,5000));\n",
+    "additions": 5,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_explore.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nfor(const key of Object.keys(parsed)){\n  const val = parsed[key];\n  console.log(key, Array.isArray(val)?val.length:'not array');\n  // try to find appId like com.xxx\n  const str = JSON.stringify(val);\n  if(str.includes('Lazanda') || str.includes('lazanda') || str.includes('com.')){\n    console.log('  contains com. maybe apps');\n    // find first occurrence\n    const idx = str.indexOf('com.');\n    console.log(str.slice(idx, idx+100));\n  }\n}\n",
+    "additions": 16,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_main_app.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nimport * as R from 'ramda';\nimport url from 'url';\nconst BASE_URL='https://play.google.com';\nconst html = scriptData.parse(fs.readFileSync('/tmp/lazanda.html','utf8'));\nconst mainAppData = R.path(['ds:4', 0, 1, 0, 23, 16], html);\nconsole.log('mainAppData', !!mainAppData);\nconst mainAppMapping = {\n    title: [2, 0, 0],\n    appId: {\n      path: [3, '12', 0, 0],\n      fun: (val) => val\n    },\n    url: {\n      path: [2, 41, 0, 2],\n      fun: (path) => path ? new url.URL(path, BASE_URL).toString() : undefined\n    },\n    icon: [2, 95, 0, 3, 2],\n    developer: [2, 68, 0],\n    developerId: {\n      path: [2, 68, 1, 4, 2],\n      fun: (link) => link ? link.split('?id=')[1] : undefined\n    },\n    summary: {\n      path: [2, 73, 0, 1],\n      fun: (val) => val || ''\n    },\n    scoreText: [2, 51, 0, 0],\n    score: [2, 51, 0, 1],\n    free: () => true,\n    price: () => 0,\n    currency: () => 'USD'\n  };\nconst result = scriptData.extractor(mainAppMapping)(mainAppData);\nconsole.log(result);\n",
+    "additions": 36,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_parse_search.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nimport * as R from 'ramda';\nimport url from 'url';\nconst BASE_URL='https://play.google.com';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nconst appsSection = R.path(['ds:4',0,1,1,22,0], parsed);\nconsole.log('appsSection length', appsSection?.length);\nconst appsMapping = {\n  title: [0, 3],\n  appId: [0, 0, 0],\n  url: {\n    path: [0, 10, 4, 2],\n    fun: (path) => new url.URL(path, BASE_URL).toString()\n  },\n  icon: [0, 1, 3, 2],\n  developer: [0, 14],\n  currency: [0, 8, 1, 0, 1],\n  price: {\n    path: [0, 8, 1, 0, 0],\n    fun: (price) => price / 1000000\n  },\n  free: {\n    path: [0, 8, 1, 0, 0],\n    fun: (price) => price === 0\n  },\n  summary: [0, 13, 1],\n  scoreText: [0, 4, 0],\n  score: [0, 4, 1]\n};\nconst processed = R.map(scriptData.extractor(appsMapping), appsSection);\nconsole.log(processed.slice(0,2));\n",
+    "additions": 33,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_search.js",
+    "before": "",
+    "after": "import got from 'got';\nimport {HttpsProxyAgent} from 'https-proxy-agent';\nimport scriptData from '/app/lib/utils/scriptData.js';\nimport * as R from 'ramda';\nimport url from 'url';\n\nconst BASE_URL='https://play.google.com/store/apps';\n\nconst term='Lazanda';\nconst lang='en';\nconst country='US';\nconst price=0;\n\nconst searchUrl = `${BASE_URL.replace('/store/apps','')}/store/search?q=${encodeURIComponent(term)}&c=apps&hl=${lang}&gl=${country}`;\nconsole.log('url',searchUrl);\n\nconst html = await got(searchUrl,{agent:{https:new HttpsProxyAgent('http://172.17.0.1:3128')}}).text();\nconsole.log('html length',html.length);\n// save sample\nimport fs from 'fs';\nfs.writeFileSync('/tmp/lazanda.html',html);\n\nconst parsed = scriptData.parse(html);\nconsole.log('parsed keys',Object.keys(parsed));\n// look for ds keys\nconsole.log(JSON.stringify(parsed,null,2).slice(0,2000));\n",
+    "additions": 26,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_search2.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nconsole.log(Object.keys(parsed));\nconst apps = parsed['ds:1']?.[0]?.[1]?.[0]?.[0]?.[0];\nconsole.log('apps?', Array.isArray(apps), apps?.length);\nif (Array.isArray(apps)) console.log(JSON.stringify(apps[0],null,2).slice(0,2000));\nconst sections = parsed['ds:1']?.[0]?.[1]?.[0]?.[0];\nconsole.log('sections length', sections?.length);\nconsole.log(JSON.stringify(sections,null,2).slice(0,5000));\n",
+    "additions": 11,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_search3.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nfunction explore(obj, path=[], depth=0, maxDepth=4){\n  if(depth>maxDepth) return;\n  if(Array.isArray(obj)){\n    console.log(path.join('.'), 'array len', obj.length);\n    // show first few elements types\n    obj.slice(0,3).forEach((v,i)=>{\n      if(v && typeof v === 'object') explore(v, [...path, i], depth+1, maxDepth);\n      else console.log([...path,i].join('.'), typeof v, String(v).slice(0,50));\n    });\n  } else if(obj && typeof obj==='object'){\n    console.log(path.join('.'), 'object keys', Object.keys(obj));\n  }\n}\nexplore(parsed['ds:1'], ['ds:1']);\n",
+    "additions": 18,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_search4.js",
+    "before": "",
+    "after": "import fs from 'fs';\nimport scriptData from './lib/utils/scriptData.js';\nconst html = fs.readFileSync('/tmp/lazanda.html','utf8');\nconst parsed = scriptData.parse(html);\nconst d = parsed['ds:1'];\nconsole.log(JSON.stringify(d[0][0], null,2).slice(0,3000));\n",
+    "additions": 6,
+    "deletions": 0,
+    "status": "added"
+  },
+  {
+    "file": "test_search_work.js",
+    "before": "",
+    "after": "import got from 'got';\nimport {HttpsProxyAgent} from 'https-proxy-agent';\nimport scriptData from './lib/utils/scriptData.js';\nimport fs from 'fs';\n\nconst term='Lazanda';\nconst lang='en';\nconst country='US';\nconst url=`https://play.google.com/work/search?q=${encodeURIComponent(term)}&hl=${lang}&gl=${country}&price=0`;\nconsole.log(url);\nconst html = await got(url,{agent:{https:new HttpsProxyAgent('http://172.17.0.1:3128')}}).text();\nfs.writeFileSync('/tmp/lazanda_work.html', html);\nconsole.log('len', html.length);\nconst parsed = scriptData.parse(html);\nconsole.log('keys', Object.keys(parsed));\nconsole.log(JSON.stringify(parsed, null,2).slice(0,3000));\n",
+    "additions": 16,
+    "deletions": 0,
+    "status": "added"
+  }
+]

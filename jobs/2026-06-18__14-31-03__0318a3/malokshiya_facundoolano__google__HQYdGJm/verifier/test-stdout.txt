@@ -1,0 +1,21 @@
+Running gold tests checkout: git clean -fd
+Removing extract_main.js
+Removing find_all_apps.js
+Removing find_app.js
+Removing find_app2.js
+Removing find_app3.js
+Removing test_ds4.js
+Removing test_explore.js
+Removing test_main_app.js
+Removing test_parse_search.js
+Removing test_search.js
+Removing test_search2.js
+Removing test_search3.js
+Removing test_search4.js
+Removing test_search_work.js
+Applying test_patch from config.json
+Required tests: 6
+Passed tests: 6
+Required tests that passed: 6
+
+RESULT: PASSED

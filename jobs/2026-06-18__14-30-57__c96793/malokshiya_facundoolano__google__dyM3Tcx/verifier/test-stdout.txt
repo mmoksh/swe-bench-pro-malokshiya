@@ -1,0 +1,9 @@
+Running gold tests checkout: git clean -fd
+Removing test/lib.search.buildMappings.js
+Applying test_patch from config.json
+Required tests: 6
+Passed tests: 2
+Required tests that passed: 2
+
+RESULT: FAILED
+Missing tests: ['Search fix should return results when searching for a well-known app', 'Search fix should work with country and language parameters', 'Search fix should return apps with valid score and pricing fields', 'Search fix should return apps with valid appId and title fields']

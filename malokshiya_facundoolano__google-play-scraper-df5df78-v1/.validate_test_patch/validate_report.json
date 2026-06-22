@@ -1,0 +1,150 @@
+{
+  "failure_reasons": [],
+  "overall": "PASS",
+  "phases": {
+    "baseline": {
+      "assertions": {
+        "fail_to_pass_must_fail": "PASS",
+        "pass_to_pass_must_pass": "PASS"
+      },
+      "classification": {
+        "expected_fail": {
+          "errored_as_expected": [],
+          "failed_as_expected": [
+            "Search fix should return results when searching for a well-known app",
+            "Search fix should return apps with valid appId and title fields",
+            "Search fix should return apps with valid score and pricing fields",
+            "Search fix should work with country and language parameters"
+          ],
+          "missing": [],
+          "other": [],
+          "passed_unexpectedly": []
+        },
+        "expected_pass": {
+          "errored": [],
+          "failed": [],
+          "missing": [],
+          "other": [],
+          "passed": [
+            "Search validation (unchanged) should throw when search term is missing",
+            "Search validation (unchanged) should reject num exceeding 250"
+          ]
+        }
+      },
+      "leaking_tests": [],
+      "meta": {
+        "apply_patch_requested": false,
+        "apply_test_patch_requested": true,
+        "patch_apply_status": "not_applied",
+        "phase": "baseline",
+        "run_script_exit_code": 0,
+        "test_patch_apply_status": "applied"
+      },
+      "overall": "PASS",
+      "tests_collected_count": 6
+    },
+    "clean": {
+      "assertions": {
+        "pass_to_pass_must_pass_at_base": "PASS"
+      },
+      "broken_tests": [],
+      "classification": {
+        "expected_pass": {
+          "errored": [],
+          "failed": [],
+          "missing": [
+            "Search validation (unchanged) should throw when search term is missing",
+            "Search validation (unchanged) should reject num exceeding 250"
+          ],
+          "other": [],
+          "passed": []
+        }
+      },
+      "meta": {
+        "apply_patch_requested": false,
+        "apply_test_patch_requested": false,
+        "patch_apply_status": "not_applied",
+        "phase": "clean",
+        "run_script_exit_code": 0,
+        "test_patch_apply_status": "not_applied"
+      },
+      "overall": "PASS",
+      "tests_collected_count": 1
+    },
+    "patch_only": {
+      "assertions": {
+        "pass_to_pass_must_pass": "PASS"
+      },
+      "classification": {
+        "expected_pass": {
+          "errored": [],
+          "failed": [],
+          "missing": [
+            "Search validation (unchanged) should throw when search term is missing",
+            "Search validation (unchanged) should reject num exceeding 250"
+          ],
+          "other": [],
+          "passed": []
+        }
+      },
+      "meta": {
+        "apply_patch_requested": true,
+        "apply_test_patch_requested": false,
+        "patch_apply_status": "applied",
+        "phase": "patch_only",
+        "run_script_exit_code": 0,
+        "test_patch_apply_status": "not_applied"
+      },
+      "overall": "PASS",
+      "regressed_tests": [],
+      "tests_collected_count": 1
+    },
+    "solution": {
+      "assertions": {
+        "fail_to_pass_must_pass": "PASS",
+        "pass_to_pass_must_pass": "PASS"
+      },
+      "classification": {
+        "expected_pass": {
+          "errored": [],
+          "failed": [],
+          "missing": [],
+          "other": [],
+          "passed": [
+            "Search fix should return results when searching for a well-known app",
+            "Search fix should return apps with valid appId and title fields",
+            "Search fix should return apps with valid score and pricing fields",
+            "Search fix should work with country and language parameters",
+            "Search validation (unchanged) should throw when search term is missing",
+            "Search validation (unchanged) should reject num exceeding 250"
+          ]
+        }
+      },
+      "fail_to_pass_failures": [],
+      "meta": {
+        "apply_patch_requested": true,
+        "apply_test_patch_requested": true,
+        "patch_apply_status": "applied",
+        "phase": "solution",
+        "run_script_exit_code": 0,
+        "test_patch_apply_status": "applied"
+      },
+      "overall": "PASS",
+      "pass_to_pass_failures": [],
+      "tests_collected_count": 6
+    }
+  },
+  "summary": {
+    "diagnostic_phases": [
+      "patch_only",
+      "clean"
+    ],
+    "duration_sec": 5,
+    "fail_to_pass_count": 4,
+    "gating_phases": [
+      "baseline",
+      "solution"
+    ],
+    "pass_to_pass_count": 2
+  }
+}
