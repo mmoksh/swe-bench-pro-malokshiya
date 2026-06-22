@@ -13,7 +13,7 @@ interface Review {
 
 ```ts
 class ReviewSync {
-  sync(appId: string, checkpoint?: string): Promise<Review[]>;
+  sync(appId: string, checkpoint?: string): Promise<reviews: Review[], checkpoint: string>;
 }
 ```
 
