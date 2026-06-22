@@ -1,0 +1,29 @@
+version = "1.0"
+
+[task]
+name = "codimango/malokshiya_facundoolano__google-play-scraper-df5df78-v2"
+authors = [{ name = "Mohammed Alokshiya", email = "malokshiya@meta.com" }]
+keywords = ["javascript", "feature-implementation", "sdk-design", "infrastructure"]
+
+[metadata]
+author_name = "Mohammed Alokshiya"
+author_email = "malokshiya@meta.com"
+difficulty = "hard"
+category = "feature-implementation"
+languages = ["javascript"]
+tags = ["feature-implementation", "swe-bench-pro", "SWEBench-External"]
+
+[verifier]
+timeout_sec = 3000.0
+
+[agent]
+timeout_sec = 3000.0
+
+[environment]
+build_timeout_sec = 1800.0
+cpus = 1
+memory_mb = 4096
+storage_mb = 10240
+gpus = 0
+allow_internet = true
+mcp_servers = []
