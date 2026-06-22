@@ -3,12 +3,12 @@ version = "1.0"
 [task]
 name = "codimango/malokshiya_facundoolano__google-play-scraper-df5df78-v2"
 authors = [{ name = "Mohammed Alokshiya", email = "malokshiya@meta.com" }]
-keywords = ["javascript", "feature-implementation", "sdk-design", "infrastructure"]
+keywords = ["javascript", "feature-implementation", "proxy-pool", "networking"]
 
 [metadata]
 author_name = "Mohammed Alokshiya"
 author_email = "malokshiya@meta.com"
-difficulty = "hard"
+difficulty = "medium"
 category = "feature-implementation"
 languages = ["javascript"]
 tags = ["feature-implementation", "swe-bench-pro", "SWEBench-External"]
