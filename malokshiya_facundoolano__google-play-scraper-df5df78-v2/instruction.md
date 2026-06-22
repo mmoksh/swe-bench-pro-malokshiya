@@ -19,8 +19,11 @@ class ProxyPool {
   getProxy(): ProxyConfig;
   reportSuccess(proxy: ProxyConfig): void;
   reportFailure(proxy: ProxyConfig): void;
+  ProxyConfig( url: string, maxFailures: int = 2, baseCooldownMs: int = 60000, maxCooldownMs: int = 3600000 )
 }
 ```
+
+* Export ProxyPool from the package entry point (index.js) so it's accessible as gplay.ProxyPool.
 
 ## Behavior Requirements
 ### Proxy Rotation Strategies (must support at least one)
