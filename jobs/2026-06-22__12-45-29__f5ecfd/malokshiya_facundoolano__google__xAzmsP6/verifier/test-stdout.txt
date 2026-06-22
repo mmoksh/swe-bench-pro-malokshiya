@@ -1,0 +1,6 @@
+Applying test_patch from config.json
+Required tests: 7
+Passed tests: 7
+Required tests that passed: 7
+
+RESULT: PASSED
