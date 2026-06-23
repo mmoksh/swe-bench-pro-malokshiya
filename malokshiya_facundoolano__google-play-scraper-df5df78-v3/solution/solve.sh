@@ -78,10 +78,10 @@ index 0000000..566222f
 +export default createScraper;
 diff --git a/lib/proxyPool.js b/lib/proxyPool.js
 new file mode 100644
-index 0000000..a0a9ff5
+index 0000000..bb2484c
 --- /dev/null
 +++ b/lib/proxyPool.js
-@@ -0,0 +1,101 @@
+@@ -0,0 +1,105 @@
 +const PLAY_STORE_BASE = 'https://play.google.com';
 +
 +class ProxyPool {
@@ -175,6 +175,10 @@ index 0000000..a0a9ff5
 +        this._recordSuccess(proxy.id);
 +        return result;
 +      } catch (err) {
++        if (err.status) {
++          this._recordSuccess(proxy.id);
++          throw err;
++        }
 +        this._recordFailure(proxy.id);
 +        lastError = err;
 +      }
