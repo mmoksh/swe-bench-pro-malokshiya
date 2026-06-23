@@ -78,10 +78,10 @@ index 0000000..566222f
 +export default createScraper;
 diff --git a/lib/proxyPool.js b/lib/proxyPool.js
 new file mode 100644
-index 0000000..70d7b2f
+index 0000000..a0a9ff5
 --- /dev/null
 +++ b/lib/proxyPool.js
-@@ -0,0 +1,104 @@
+@@ -0,0 +1,101 @@
 +const PLAY_STORE_BASE = 'https://play.google.com';
 +
 +class ProxyPool {
@@ -140,14 +140,11 @@ index 0000000..70d7b2f
 +  }
 +
 +  getMetrics () {
-+    const now = Date.now();
++    this._getHealthy();
 +    return {
 +      proxies: this._proxies.map((p) => {
 +        const s = this._state.get(p.id);
-+        let state = s.state;
-+        if (state === 'cooldown' && s.disabledUntil <= now) {
-+          state = 'healthy';
-+        }
++        const state = s.state;
 +        const entry = { id: p.id, requests: s.requests, failures: s.failures, state };
 +        if (state === 'cooldown') {
 +          entry.resumeTime = s.disabledUntil;
