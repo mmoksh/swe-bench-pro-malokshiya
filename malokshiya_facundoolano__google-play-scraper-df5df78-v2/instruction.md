@@ -27,6 +27,6 @@ This should return a list of reviews since the checkpoint '12345', up to 1000 re
 }
 ```
 
-* Only include nextCheckpoint when checkpoint is provided; otherwise the field must be absent
+* Always include the nextCheckpoint in the response, even if it is null. This is to indicate that there are no more reviews to fetch.
 * nextCheckpoint = the id of the newest review returned (first element of data)
 * nextCheckpoint = null when no reviews are returned
