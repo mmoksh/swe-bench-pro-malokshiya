@@ -18,3 +18,11 @@ gplay.reviews({
 
 ```
 This should return a list of reviews since the checkpoint '12345', up to 1000 reviews. If the checkpoint 12345 is found at the 300th review, the library should return the reviews from 1st to 299th.
+
+* The response should include the next checkpoint, so that the client can continue fetching reviews from the next checkpoint. Example:
+```
+{
+  data: [...],
+  nextCheckpoint: 'NEXT_CHECKPOINT'
+}
+```
