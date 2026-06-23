@@ -1,0 +1,8 @@
+{
+  "id": "2",
+  "subject": "Create test/lib.proxyPool.js",
+  "description": "Unit tests for ProxyPool using Mocha + Chai + sinon fake timers.",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

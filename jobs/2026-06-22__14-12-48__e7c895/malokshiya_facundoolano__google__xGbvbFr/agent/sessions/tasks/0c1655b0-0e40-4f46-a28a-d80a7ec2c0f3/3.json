@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Export ProxyPool from index.js",
+  "description": "Add ProxyPool to the package exports in index.js",
+  "activeForm": "Exporting ProxyPool",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

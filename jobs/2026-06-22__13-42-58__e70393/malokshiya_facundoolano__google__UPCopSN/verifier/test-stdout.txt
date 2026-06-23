@@ -1,0 +1,7 @@
+Applying test_patch from config.json
+Required tests: 8
+Passed tests: 2
+Required tests that passed: 2
+
+RESULT: FAILED
+Missing tests: ['ProxyPool should add proxies and return them via getProxy', 'ProxyPool should restore a proxy after reportSuccess', 'ProxyPool should provide fair distribution across healthy proxies', 'ProxyPool should throw when no proxies are available', 'ProxyPool should rotate proxies in round-robin order', 'ProxyPool should disable a proxy after maxFailures consecutive failures']

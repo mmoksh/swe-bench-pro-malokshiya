@@ -1,0 +1,186 @@
+Running selected tests: test/test_review_sync.js
+{
+  "stats": {
+    "suites": 2,
+    "tests": 7,
+    "passes": 2,
+    "pending": 0,
+    "failures": 5,
+    "start": "2026-06-22T20:48:28.149Z",
+    "end": "2026-06-22T20:48:28.154Z",
+    "duration": 5
+  },
+  "tests": [
+    {
+      "title": "should fetch all reviews on first run (no checkpoint)",
+      "fullTitle": "ReviewSync should fetch all reviews on first run (no checkpoint)",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should fetch only new reviews when checkpoint is provided",
+      "fullTitle": "ReviewSync should fetch only new reviews when checkpoint is provided",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should deduplicate reviews with same id",
+      "fullTitle": "ReviewSync should deduplicate reviews with same id",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should return reviews sorted by timestamp descending",
+      "fullTitle": "ReviewSync should return reviews sorted by timestamp descending",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should return existing checkpoint when no new reviews found",
+      "fullTitle": "ReviewSync should return existing checkpoint when no new reviews found",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should export ReviewSync from main module",
+      "fullTitle": "ReviewSync exports (unchanged) should export ReviewSync from main module",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ReviewSync exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [
+    {
+      "title": "should fetch all reviews on first run (no checkpoint)",
+      "fullTitle": "ReviewSync should fetch all reviews on first run (no checkpoint)",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should fetch only new reviews when checkpoint is provided",
+      "fullTitle": "ReviewSync should fetch only new reviews when checkpoint is provided",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should deduplicate reviews with same id",
+      "fullTitle": "ReviewSync should deduplicate reviews with same id",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should return reviews sorted by timestamp descending",
+      "fullTitle": "ReviewSync should return reviews sorted by timestamp descending",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    },
+    {
+      "title": "should return existing checkpoint when no new reviews found",
+      "fullTitle": "ReviewSync should return existing checkpoint when no new reviews found",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js\n    at finalizeResolution (node:internal/modules/esm/resolve:283:11)\n    at moduleResolve (node:internal/modules/esm/resolve:952:10)\n    at defaultResolve (node:internal/modules/esm/resolve:1188:11)\n    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)\n    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)\n    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)\n    at ModuleLoader.import (node:internal/modules/esm/loader:605:34)\n    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:221:31)\n    at importModuleDynamicallyCallback (node:internal/modules/esm/utils:260:12)\n    at load (file:///app/test/test_review_sync.js:6:38)\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:24:43)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "code": "ERR_MODULE_NOT_FOUND",
+        "url": "file:///app/lib/infra/reviewSync.js",
+        "message": "Cannot find module '/app/lib/infra/reviewSync.js' imported from /app/test/test_review_sync.js"
+      }
+    }
+  ],
+  "passes": [
+    {
+      "title": "should export ReviewSync from main module",
+      "fullTitle": "ReviewSync exports (unchanged) should export ReviewSync from main module",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ReviewSync exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ]
+}

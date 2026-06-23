@@ -1,0 +1,196 @@
+Running selected tests: test/test_proxy_pool.js
+{
+  "stats": {
+    "suites": 2,
+    "tests": 8,
+    "passes": 2,
+    "pending": 0,
+    "failures": 6,
+    "start": "2026-06-22T22:28:59.778Z",
+    "end": "2026-06-22T22:28:59.783Z",
+    "duration": 5
+  },
+  "tests": [
+    {
+      "title": "should add proxies and return them via getProxy",
+      "fullTitle": "ProxyPool should add proxies and return them via getProxy",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:7:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should rotate proxies in round-robin order",
+      "fullTitle": "ProxyPool should rotate proxies in round-robin order",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:14:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should throw when no proxies are available",
+      "fullTitle": "ProxyPool should throw when no proxies are available",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 2,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [Function] to throw error matching /No proxies available/ but got 'No proxies in pool'",
+        "showDiff": true,
+        "actual": "No proxies in pool",
+        "expected": {},
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected [Function] to throw error matching /No proxies available/ but got 'No proxies in pool'\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:29:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should disable a proxy after maxFailures consecutive failures",
+      "fullTitle": "ProxyPool should disable a proxy after maxFailures consecutive failures",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:36:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should restore a proxy after reportSuccess",
+      "fullTitle": "ProxyPool should restore a proxy after reportSuccess",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:52:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should provide fair distribution across healthy proxies",
+      "fullTitle": "ProxyPool should provide fair distribution across healthy proxies",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:68:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should export ProxyPool from main module",
+      "fullTitle": "ProxyPool exports (unchanged) should export ProxyPool from main module",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ProxyPool exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [
+    {
+      "title": "should add proxies and return them via getProxy",
+      "fullTitle": "ProxyPool should add proxies and return them via getProxy",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:7:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should rotate proxies in round-robin order",
+      "fullTitle": "ProxyPool should rotate proxies in round-robin order",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:14:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should throw when no proxies are available",
+      "fullTitle": "ProxyPool should throw when no proxies are available",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 2,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [Function] to throw error matching /No proxies available/ but got 'No proxies in pool'",
+        "showDiff": true,
+        "actual": "No proxies in pool",
+        "expected": {},
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected [Function] to throw error matching /No proxies available/ but got 'No proxies in pool'\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:29:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should disable a proxy after maxFailures consecutive failures",
+      "fullTitle": "ProxyPool should disable a proxy after maxFailures consecutive failures",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:36:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should restore a proxy after reportSuccess",
+      "fullTitle": "ProxyPool should restore a proxy after reportSuccess",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:52:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    },
+    {
+      "title": "should provide fair distribution across healthy proxies",
+      "fullTitle": "ProxyPool should provide fair distribution across healthy proxies",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "Error: proxy must be an instance of ProxyConfig\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:22:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:68:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be an instance of ProxyConfig"
+      }
+    }
+  ],
+  "passes": [
+    {
+      "title": "should export ProxyPool from main module",
+      "fullTitle": "ProxyPool exports (unchanged) should export ProxyPool from main module",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ProxyPool exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ]
+}

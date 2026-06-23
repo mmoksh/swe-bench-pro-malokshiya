@@ -1,0 +1,32 @@
+{
+  "tests": [
+    {
+      "name": "ReviewSync should deduplicate reviews with same id",
+      "status": "PASSED"
+    },
+    {
+      "name": "ReviewSync exports (unchanged) should preserve existing gplay methods",
+      "status": "PASSED"
+    },
+    {
+      "name": "ReviewSync should fetch all reviews on first run (no checkpoint)",
+      "status": "FAILED"
+    },
+    {
+      "name": "ReviewSync should fetch only new reviews when checkpoint is provided",
+      "status": "FAILED"
+    },
+    {
+      "name": "ReviewSync should return reviews sorted by timestamp descending",
+      "status": "FAILED"
+    },
+    {
+      "name": "ReviewSync should return existing checkpoint when no new reviews found",
+      "status": "FAILED"
+    },
+    {
+      "name": "ReviewSync exports (unchanged) should export ReviewSync from main module",
+      "status": "FAILED"
+    }
+  ]
+}

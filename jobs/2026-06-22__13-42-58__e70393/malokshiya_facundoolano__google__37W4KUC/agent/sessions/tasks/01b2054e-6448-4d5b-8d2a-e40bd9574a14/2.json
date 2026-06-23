@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Create proxy agent helper",
+  "description": "Create lib/utils/proxyAgent.js to build got-compatible HTTP agents using Node.js built-in CONNECT tunneling",
+  "activeForm": "Creating proxy agent helper",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,7 @@
+Applying test_patch from config.json
+Required tests: 7
+Passed tests: 3
+Required tests that passed: 3
+
+RESULT: FAILED
+Missing tests: ['ReviewSync should return existing checkpoint when no new reviews found', 'ReviewSync should fetch all reviews on first run (no checkpoint)', 'ReviewSync should return reviews sorted by timestamp descending', 'ReviewSync should fetch only new reviews when checkpoint is provided']

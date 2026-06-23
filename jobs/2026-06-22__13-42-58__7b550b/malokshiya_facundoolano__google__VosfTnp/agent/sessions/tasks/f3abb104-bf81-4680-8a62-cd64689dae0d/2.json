@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Add TypeScript declarations",
+  "description": "Add Review, ReviewSync, and sync method types to index.d.ts",
+  "activeForm": "Adding TypeScript declarations",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

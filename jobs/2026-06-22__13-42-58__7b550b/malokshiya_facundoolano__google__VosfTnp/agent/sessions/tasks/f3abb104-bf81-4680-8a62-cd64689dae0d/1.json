@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Implement ReviewSync class",
+  "description": "Create lib/reviewSync.js with incremental sync logic: checkpoint-based pagination, early stopping, deduplication",
+  "activeForm": "Implementing ReviewSync class",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,184 @@
+Running selected tests: test/test_proxy_pool.js
+{
+  "stats": {
+    "suites": 2,
+    "tests": 8,
+    "passes": 3,
+    "pending": 0,
+    "failures": 5,
+    "start": "2026-06-22T21:52:14.550Z",
+    "end": "2026-06-22T21:52:14.554Z",
+    "duration": 4
+  },
+  "tests": [
+    {
+      "title": "should add proxies and return them via getProxy",
+      "fullTitle": "ProxyPool should add proxies and return them via getProxy",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:7:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should rotate proxies in round-robin order",
+      "fullTitle": "ProxyPool should rotate proxies in round-robin order",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:14:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should throw when no proxies are available",
+      "fullTitle": "ProxyPool should throw when no proxies are available",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should disable a proxy after maxFailures consecutive failures",
+      "fullTitle": "ProxyPool should disable a proxy after maxFailures consecutive failures",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:36:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should restore a proxy after reportSuccess",
+      "fullTitle": "ProxyPool should restore a proxy after reportSuccess",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:52:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should provide fair distribution across healthy proxies",
+      "fullTitle": "ProxyPool should provide fair distribution across healthy proxies",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:68:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should export ProxyPool from main module",
+      "fullTitle": "ProxyPool exports (unchanged) should export ProxyPool from main module",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ProxyPool exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [
+    {
+      "title": "should add proxies and return them via getProxy",
+      "fullTitle": "ProxyPool should add proxies and return them via getProxy",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:7:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should rotate proxies in round-robin order",
+      "fullTitle": "ProxyPool should rotate proxies in round-robin order",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:14:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should disable a proxy after maxFailures consecutive failures",
+      "fullTitle": "ProxyPool should disable a proxy after maxFailures consecutive failures",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:36:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should restore a proxy after reportSuccess",
+      "fullTitle": "ProxyPool should restore a proxy after reportSuccess",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:52:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    },
+    {
+      "title": "should provide fair distribution across healthy proxies",
+      "fullTitle": "ProxyPool should provide fair distribution across healthy proxies",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: proxy must be a ProxyConfig instance\n    at ProxyPool.add (file:///app/lib/utils/proxyPool.js:21:13)\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:68:10)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "proxy must be a ProxyConfig instance"
+      }
+    }
+  ],
+  "passes": [
+    {
+      "title": "should throw when no proxies are available",
+      "fullTitle": "ProxyPool should throw when no proxies are available",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should export ProxyPool from main module",
+      "fullTitle": "ProxyPool exports (unchanged) should export ProxyPool from main module",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ProxyPool exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ]
+}

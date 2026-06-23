@@ -1,0 +1,118 @@
+{
+    "id": "881949fa-28e4-47ab-bfde-f52a9a0e0b5e",
+    "task_name": "codimango/malokshiya_facundoolano__google-play-scraper-df5df78-v3",
+    "trial_name": "malokshiya_facundoolano__google__wCKpGw6",
+    "trial_uri": "file:///data/repos/swe-bench-pro-malokshiya/jobs/2026-06-22__13-56-06__c43c2e/malokshiya_facundoolano__google__wCKpGw6",
+    "task_id": {
+        "path": "malokshiya_facundoolano__google-play-scraper-df5df78-v3"
+    },
+    "source": null,
+    "task_checksum": "d169d728009daa96bcc7f2e409f67a06441eb70f8080b26b99e59c08d7881196",
+    "config": {
+        "task": {
+            "path": "malokshiya_facundoolano__google-play-scraper-df5df78-v3",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "malokshiya_facundoolano__google__wCKpGw6",
+        "trials_dir": "/data/repos/swe-bench-pro-malokshiya/jobs/2026-06-22__13-56-06__c43c2e",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "claude-code",
+            "import_path": null,
+            "model_name": "claude-opus-4-6",
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {},
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "mounts": [
+                {
+                    "type": "bind",
+                    "source": "/home/malokshiya/.cache/codimango/claude-code",
+                    "target": "/opt/claude-code-cache",
+                    "read_only": true
+                }
+            ],
+            "toolshed": null,
+            "extra_docker_compose": [],
+            "env": {
+                "HARBOR_CLAUDE_CODE_CACHE_DIR": "/opt/claude-code-cache"
+            },
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "ee533059-ac31-4708-9bc5-6ee8ccc47bb1"
+    },
+    "agent_info": {
+        "name": "claude-code",
+        "version": "2.1.186",
+        "model_info": {
+            "name": "claude-opus-4-6",
+            "provider": null
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 288697,
+        "n_cache_tokens": 272077,
+        "n_output_tokens": 4740,
+        "cost_usd": 0.35840350000000004,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "baseline_result": null,
+    "exception_info": null,
+    "started_at": "2026-06-22T20:56:09.331403Z",
+    "finished_at": "2026-06-22T20:58:01.734433Z",
+    "environment_setup": {
+        "started_at": "2026-06-22T20:56:09.404720Z",
+        "finished_at": "2026-06-22T20:56:19.072079Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-06-22T20:56:19.072117Z",
+        "finished_at": "2026-06-22T20:56:22.951790Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-06-22T20:56:22.952054Z",
+        "finished_at": "2026-06-22T20:57:49.031294Z"
+    },
+    "verifier": {
+        "started_at": "2026-06-22T20:57:49.428538Z",
+        "finished_at": "2026-06-22T20:57:50.454732Z"
+    },
+    "step_results": null
+}

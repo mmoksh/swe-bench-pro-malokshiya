@@ -1,0 +1,9 @@
+{
+  "id": "5",
+  "subject": "Install hpagent dependency and run tests",
+  "description": "Add hpagent for proxy agent support and verify all tests pass",
+  "activeForm": "Installing dependencies and running tests",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

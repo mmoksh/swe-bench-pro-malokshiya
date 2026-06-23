@@ -1,0 +1,198 @@
+Running selected tests: test/test_review_sync.js
+{
+  "stats": {
+    "suites": 2,
+    "tests": 7,
+    "passes": 2,
+    "pending": 0,
+    "failures": 5,
+    "start": "2026-06-22T20:58:07.287Z",
+    "end": "2026-06-22T20:58:07.295Z",
+    "duration": 8
+  },
+  "tests": [
+    {
+      "title": "should fetch all reviews on first run (no checkpoint)",
+      "fullTitle": "ReviewSync should fetch all reviews on first run (no checkpoint)",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 3,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected '{\"seenIds\":[\"r1\",\"r2\",\"r3\"]}' to equal '300'",
+        "showDiff": true,
+        "actual": "{\"seenIds\":[\"r1\",\"r2\",\"r3\"]}",
+        "expected": "300",
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected '{\"seenIds\":[\"r1\",\"r2\",\"r3\"]}' to equal '300'\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:33:12)"
+      }
+    },
+    {
+      "title": "should fetch only new reviews when checkpoint is provided",
+      "fullTitle": "ReviewSync should fetch only new reviews when checkpoint is provided",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [ { id: 'r4', timestamp: 400 }, …(2) ] to have a length of 1 but got 3",
+        "showDiff": true,
+        "actual": "3",
+        "expected": "1",
+        "stack": "AssertionError: expected [ { id: 'r4', timestamp: 400 }, …(2) ] to have a length of 1 but got 3\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:45:12)"
+      }
+    },
+    {
+      "title": "should deduplicate reviews with same id",
+      "fullTitle": "ReviewSync should deduplicate reviews with same id",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should return reviews sorted by timestamp descending",
+      "fullTitle": "ReviewSync should return reviews sorted by timestamp descending",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected 100 to be at least 300",
+        "showDiff": true,
+        "actual": "100",
+        "expected": "300",
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected 100 to be at least 300\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:73:14)"
+      }
+    },
+    {
+      "title": "should return existing checkpoint when no new reviews found",
+      "fullTitle": "ReviewSync should return existing checkpoint when no new reviews found",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [ { id: 'r1', timestamp: 100 } ] to have a length of +0 but got 1",
+        "showDiff": true,
+        "actual": "1",
+        "expected": "0",
+        "stack": "AssertionError: expected [ { id: 'r1', timestamp: 100 } ] to have a length of +0 but got 1\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:85:12)"
+      }
+    },
+    {
+      "title": "should export ReviewSync from main module",
+      "fullTitle": "ReviewSync exports (unchanged) should export ReviewSync from main module",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected undefined to be a function",
+        "showDiff": false,
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected undefined to be a function\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:92:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ReviewSync exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [
+    {
+      "title": "should fetch all reviews on first run (no checkpoint)",
+      "fullTitle": "ReviewSync should fetch all reviews on first run (no checkpoint)",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 3,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected '{\"seenIds\":[\"r1\",\"r2\",\"r3\"]}' to equal '300'",
+        "showDiff": true,
+        "actual": "{\"seenIds\":[\"r1\",\"r2\",\"r3\"]}",
+        "expected": "300",
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected '{\"seenIds\":[\"r1\",\"r2\",\"r3\"]}' to equal '300'\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:33:12)"
+      }
+    },
+    {
+      "title": "should fetch only new reviews when checkpoint is provided",
+      "fullTitle": "ReviewSync should fetch only new reviews when checkpoint is provided",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [ { id: 'r4', timestamp: 400 }, …(2) ] to have a length of 1 but got 3",
+        "showDiff": true,
+        "actual": "3",
+        "expected": "1",
+        "stack": "AssertionError: expected [ { id: 'r4', timestamp: 400 }, …(2) ] to have a length of 1 but got 3\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:45:12)"
+      }
+    },
+    {
+      "title": "should return reviews sorted by timestamp descending",
+      "fullTitle": "ReviewSync should return reviews sorted by timestamp descending",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected 100 to be at least 300",
+        "showDiff": true,
+        "actual": "100",
+        "expected": "300",
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected 100 to be at least 300\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:73:14)"
+      }
+    },
+    {
+      "title": "should return existing checkpoint when no new reviews found",
+      "fullTitle": "ReviewSync should return existing checkpoint when no new reviews found",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [ { id: 'r1', timestamp: 100 } ] to have a length of +0 but got 1",
+        "showDiff": true,
+        "actual": "1",
+        "expected": "0",
+        "stack": "AssertionError: expected [ { id: 'r1', timestamp: 100 } ] to have a length of +0 but got 1\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:85:12)"
+      }
+    },
+    {
+      "title": "should export ReviewSync from main module",
+      "fullTitle": "ReviewSync exports (unchanged) should export ReviewSync from main module",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected undefined to be a function",
+        "showDiff": false,
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected undefined to be a function\n    at Context.<anonymous> (file:///app/test/test_review_sync.js:92:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    }
+  ],
+  "passes": [
+    {
+      "title": "should deduplicate reviews with same id",
+      "fullTitle": "ReviewSync should deduplicate reviews with same id",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ReviewSync exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_review_sync.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ]
+}

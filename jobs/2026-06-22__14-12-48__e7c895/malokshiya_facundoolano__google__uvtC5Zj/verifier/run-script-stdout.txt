@@ -1,0 +1,202 @@
+Running selected tests: test/test_proxy_pool.js
+{
+  "stats": {
+    "suites": 2,
+    "tests": 8,
+    "passes": 4,
+    "pending": 0,
+    "failures": 4,
+    "start": "2026-06-22T21:24:31.090Z",
+    "end": "2026-06-22T21:24:31.098Z",
+    "duration": 8
+  },
+  "tests": [
+    {
+      "title": "should add proxies and return them via getProxy",
+      "fullTitle": "ProxyPool should add proxies and return them via getProxy",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should rotate proxies in round-robin order",
+      "fullTitle": "ProxyPool should rotate proxies in round-robin order",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "message": "consecutive calls should return different proxies: expected 'http://p1:8080' to not equal 'http://p1:8080'",
+        "showDiff": true,
+        "actual": "http://p1:8080",
+        "expected": "http://p1:8080",
+        "operator": "notStrictEqual",
+        "stack": "AssertionError: consecutive calls should return different proxies: expected 'http://p1:8080' to not equal 'http://p1:8080'\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:24:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should throw when no proxies are available",
+      "fullTitle": "ProxyPool should throw when no proxies are available",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [Function] to throw an error",
+        "showDiff": true,
+        "expected": null,
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected [Function] to throw an error\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:29:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should disable a proxy after maxFailures consecutive failures",
+      "fullTitle": "ProxyPool should disable a proxy after maxFailures consecutive failures",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: Cannot read properties of null (reading 'url')\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:44:34)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "Cannot read properties of null (reading 'url')"
+      }
+    },
+    {
+      "title": "should restore a proxy after reportSuccess",
+      "fullTitle": "ProxyPool should restore a proxy after reportSuccess",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should provide fair distribution across healthy proxies",
+      "fullTitle": "ProxyPool should provide fair distribution across healthy proxies",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "all proxies should be used: expected 1 to equal 3",
+        "showDiff": true,
+        "actual": "1",
+        "expected": "3",
+        "operator": "strictEqual",
+        "stack": "AssertionError: all proxies should be used: expected 1 to equal 3\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:79:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should export ProxyPool from main module",
+      "fullTitle": "ProxyPool exports (unchanged) should export ProxyPool from main module",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ProxyPool exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [
+    {
+      "title": "should rotate proxies in round-robin order",
+      "fullTitle": "ProxyPool should rotate proxies in round-robin order",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {
+        "message": "consecutive calls should return different proxies: expected 'http://p1:8080' to not equal 'http://p1:8080'",
+        "showDiff": true,
+        "actual": "http://p1:8080",
+        "expected": "http://p1:8080",
+        "operator": "notStrictEqual",
+        "stack": "AssertionError: consecutive calls should return different proxies: expected 'http://p1:8080' to not equal 'http://p1:8080'\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:24:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should throw when no proxies are available",
+      "fullTitle": "ProxyPool should throw when no proxies are available",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "expected [Function] to throw an error",
+        "showDiff": true,
+        "expected": null,
+        "operator": "strictEqual",
+        "stack": "AssertionError: expected [Function] to throw an error\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:29:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    },
+    {
+      "title": "should disable a proxy after maxFailures consecutive failures",
+      "fullTitle": "ProxyPool should disable a proxy after maxFailures consecutive failures",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "stack": "TypeError: Cannot read properties of null (reading 'url')\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:44:34)\n    at process.processImmediate (node:internal/timers:483:21)",
+        "message": "Cannot read properties of null (reading 'url')"
+      }
+    },
+    {
+      "title": "should provide fair distribution across healthy proxies",
+      "fullTitle": "ProxyPool should provide fair distribution across healthy proxies",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "err": {
+        "message": "all proxies should be used: expected 1 to equal 3",
+        "showDiff": true,
+        "actual": "1",
+        "expected": "3",
+        "operator": "strictEqual",
+        "stack": "AssertionError: all proxies should be used: expected 1 to equal 3\n    at Context.<anonymous> (file:///app/test/test_proxy_pool.js:79:12)\n    at process.processImmediate (node:internal/timers:483:21)"
+      }
+    }
+  ],
+  "passes": [
+    {
+      "title": "should add proxies and return them via getProxy",
+      "fullTitle": "ProxyPool should add proxies and return them via getProxy",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 1,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should restore a proxy after reportSuccess",
+      "fullTitle": "ProxyPool should restore a proxy after reportSuccess",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should export ProxyPool from main module",
+      "fullTitle": "ProxyPool exports (unchanged) should export ProxyPool from main module",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should preserve existing gplay methods",
+      "fullTitle": "ProxyPool exports (unchanged) should preserve existing gplay methods",
+      "file": "/app/test/test_proxy_pool.js",
+      "duration": 0,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    }
+  ]
+}

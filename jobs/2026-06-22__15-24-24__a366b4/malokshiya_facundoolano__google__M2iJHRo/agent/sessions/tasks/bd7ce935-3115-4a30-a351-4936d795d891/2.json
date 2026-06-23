@@ -1,0 +1,8 @@
+{
+  "id": "2",
+  "subject": "Export ProxyPool from index.js and index.d.ts",
+  "description": "Add ProxyPool to the default export in index.js and add TypeScript types in index.d.ts",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

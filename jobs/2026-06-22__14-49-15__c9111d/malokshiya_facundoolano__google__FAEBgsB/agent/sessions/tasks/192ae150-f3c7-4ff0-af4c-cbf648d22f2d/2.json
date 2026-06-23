@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Export ProxyPool from index.js",
+  "description": "Add ProxyPool to the default export in index.js so it's accessible as gplay.ProxyPool",
+  "activeForm": "Exporting ProxyPool",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

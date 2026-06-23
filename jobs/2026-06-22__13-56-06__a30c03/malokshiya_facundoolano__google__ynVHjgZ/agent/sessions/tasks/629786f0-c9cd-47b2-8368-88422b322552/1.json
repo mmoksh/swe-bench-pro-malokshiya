@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Create ProxyPool class",
+  "description": "Create lib/utils/proxyPool.js with round-robin rotation, failure tracking, cooldown with exponential backoff, and health recovery.",
+  "activeForm": "Creating ProxyPool class",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

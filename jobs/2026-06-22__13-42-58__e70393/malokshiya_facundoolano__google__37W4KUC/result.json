@@ -1,0 +1,118 @@
+{
+    "id": "fdc46dc3-65e6-49b5-a294-2856abd92951",
+    "task_name": "codimango/malokshiya_facundoolano__google-play-scraper-df5df78-v2",
+    "trial_name": "malokshiya_facundoolano__google__37W4KUC",
+    "trial_uri": "file:///data/repos/swe-bench-pro-malokshiya/jobs/2026-06-22__13-42-58__e70393/malokshiya_facundoolano__google__37W4KUC",
+    "task_id": {
+        "path": "malokshiya_facundoolano__google-play-scraper-df5df78-v2"
+    },
+    "source": null,
+    "task_checksum": "26643680a1c4e86487f463cafe2cbbd96252cb3869a93f8423223500d6a8b2f1",
+    "config": {
+        "task": {
+            "path": "malokshiya_facundoolano__google-play-scraper-df5df78-v2",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "malokshiya_facundoolano__google__37W4KUC",
+        "trials_dir": "/data/repos/swe-bench-pro-malokshiya/jobs/2026-06-22__13-42-58__e70393",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "claude-code",
+            "import_path": null,
+            "model_name": "claude-opus-4-6",
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {},
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "mounts": [
+                {
+                    "type": "bind",
+                    "source": "/home/malokshiya/.cache/codimango/claude-code",
+                    "target": "/opt/claude-code-cache",
+                    "read_only": true
+                }
+            ],
+            "toolshed": null,
+            "extra_docker_compose": [],
+            "env": {
+                "HARBOR_CLAUDE_CODE_CACHE_DIR": "/opt/claude-code-cache"
+            },
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "83eefaa3-4203-4764-9e6b-6727e9d2ec49"
+    },
+    "agent_info": {
+        "name": "claude-code",
+        "version": "2.1.186",
+        "model_info": {
+            "name": "claude-opus-4-6",
+            "provider": null
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 1845992,
+        "n_cache_tokens": 1801528,
+        "n_output_tokens": 20545,
+        "cost_usd": 2.5588539999999997,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "baseline_result": null,
+    "exception_info": null,
+    "started_at": "2026-06-22T20:43:01.061392Z",
+    "finished_at": "2026-06-22T20:53:58.683743Z",
+    "environment_setup": {
+        "started_at": "2026-06-22T20:43:01.131789Z",
+        "finished_at": "2026-06-22T20:43:11.266579Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-06-22T20:43:11.266618Z",
+        "finished_at": "2026-06-22T20:43:15.194048Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-06-22T20:43:15.194273Z",
+        "finished_at": "2026-06-22T20:53:45.177878Z"
+    },
+    "verifier": {
+        "started_at": "2026-06-22T20:53:45.645885Z",
+        "finished_at": "2026-06-22T20:53:46.675941Z"
+    },
+    "step_results": null
+}

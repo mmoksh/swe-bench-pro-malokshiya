@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Create ReviewSync class in lib/reviewSync.js",
+  "description": "Implement the ReviewSync class with checkpoint-based incremental review fetching. Uses existing reviews() with paginate:true and sort:NEWEST. Checkpoint encodes the max timestamp and IDs at that timestamp.",
+  "activeForm": "Implementing ReviewSync class",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

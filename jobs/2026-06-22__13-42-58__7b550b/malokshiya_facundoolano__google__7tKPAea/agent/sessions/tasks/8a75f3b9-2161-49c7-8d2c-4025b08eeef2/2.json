@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Export ReviewSync from index.js and add TypeScript types",
+  "description": "Wire up the new class in index.js exports and add the Review, ReviewSync interfaces to index.d.ts",
+  "activeForm": "Updating exports and type definitions",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

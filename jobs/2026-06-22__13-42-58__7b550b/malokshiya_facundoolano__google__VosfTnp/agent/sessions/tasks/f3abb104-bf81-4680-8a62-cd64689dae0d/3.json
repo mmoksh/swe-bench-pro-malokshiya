@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Export ReviewSync from index.js",
+  "description": "Wire up the new module in the library's main entry point",
+  "activeForm": "Exporting ReviewSync",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

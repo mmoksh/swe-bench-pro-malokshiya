@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Create ProxyPool class",
+  "description": "Create lib/utils/proxyPool.js with the ProxyPool class: add(), getProxy() with round-robin, reportSuccess(), reportFailure() with exponential backoff, getUrl() helper",
+  "activeForm": "Creating ProxyPool class",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

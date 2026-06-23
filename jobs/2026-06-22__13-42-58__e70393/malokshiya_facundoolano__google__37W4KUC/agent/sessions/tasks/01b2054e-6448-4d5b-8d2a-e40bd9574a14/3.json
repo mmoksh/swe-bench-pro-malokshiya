@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Integrate proxy pool into request.js",
+  "description": "Modify request.js to use ProxyPool when configured, reporting success/failure after each request",
+  "activeForm": "Integrating proxy pool",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

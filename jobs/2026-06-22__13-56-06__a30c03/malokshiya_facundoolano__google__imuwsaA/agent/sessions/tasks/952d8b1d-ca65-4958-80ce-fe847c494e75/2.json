@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Integrate ProxyPool into request module",
+  "description": "Modify lib/utils/request.js to accept a proxyPool, get a proxy per request, create HTTP agent, and report success/failure",
+  "activeForm": "Integrating ProxyPool into request module",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Export ProxyPool and update types",
+  "description": "Export ProxyPool from index.js, add TypeScript types to index.d.ts, add hpagent dependency.",
+  "activeForm": "Updating exports and types",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

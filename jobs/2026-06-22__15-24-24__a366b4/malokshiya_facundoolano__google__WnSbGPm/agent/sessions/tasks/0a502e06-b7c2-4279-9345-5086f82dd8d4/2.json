@@ -1,0 +1,8 @@
+{
+  "id": "2",
+  "subject": "Export ProxyPool from index.js",
+  "description": "Import ProxyPool in index.js and add it to the default export object.",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

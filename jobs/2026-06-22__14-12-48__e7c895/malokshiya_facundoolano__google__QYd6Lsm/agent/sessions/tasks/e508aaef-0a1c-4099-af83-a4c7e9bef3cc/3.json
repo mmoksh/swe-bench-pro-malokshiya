@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Add ProxyPool tests",
+  "description": "Create test/utils.proxyPool.js with comprehensive tests for rotation, failure handling, cooldown, and recovery.",
+  "activeForm": "Writing tests",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

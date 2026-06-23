@@ -1,0 +1,8 @@
+{
+  "id": "3",
+  "subject": "Write test/utils.proxyPool.js",
+  "description": "Unit tests for ProxyPool covering: round-robin rotation, failure disabling, cooldown re-enable, exponential backoff, all-proxies-disabled error, and reportSuccess reset. Use sinon fake timers — no network calls.",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}
