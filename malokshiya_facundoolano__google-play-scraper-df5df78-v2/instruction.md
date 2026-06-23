@@ -26,3 +26,7 @@ This should return a list of reviews since the checkpoint '12345', up to 1000 re
   nextCheckpoint: 'NEXT_CHECKPOINT'
 }
 ```
+
+1. Only include nextCheckpoint when checkpoint is provided; otherwise the field must be absent
+2. nextCheckpoint = the id of the newest review returned (first element of data)
+3. nextCheckpoint = null when no reviews are returned
