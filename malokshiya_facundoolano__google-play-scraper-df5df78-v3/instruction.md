@@ -21,9 +21,17 @@ const scraper = createScraper({
     cooldownMs: 300000
   }
 });
+
+scraper.app({appId: 'com.google.android.apps.translate'})
+  .then(console.log, console.log);
 ```
 
+## Assumptions
+* Assume each proxy is a web server that accepts HTTP requests, and it returns the same response as the Google Play API. So instead of making a request to `https://play.google.com/store/apps/details?id=com.google.android.apps.translate`, you make a request to `http://proxy1/store/apps/details?id=com.google.android.apps.translate`.
+
 ## Requirements
+When a list of proxies is provided, the scraper should send the requests through the proxies, not directly to Google Play.
+
 ### Proxy Rotation
 * Maintain a pool of configured proxies.
 * Distribute requests evenly across all healthy proxies.
@@ -34,12 +42,12 @@ const scraper = createScraper({
 A request should be considered failed when:
 * The connection to the proxy cannot be established.
 * The request times out.
-* The proxy returns a transport-level error.
+* The proxy returns an error.
 
 Each proxy must maintain an independent failure counter.
 ### Proxy Disabling
 * When a proxy reaches `maxFailures`, it must be removed from the active rotation.
-* Disabled proxies must not be selected for new requests.
+* Disabled proxies must not be selected for new requests until they recover.
 
 ### Cooldown Recovery
 * A disabled proxy remains unavailable for `cooldownMs`.
@@ -51,13 +59,14 @@ If a request fails because of a proxy failure:
 * Retry the request using a different healthy proxy.
 * Do not retry the same proxy during the same request.
 * Stop retrying once all currently healthy proxies have been attempted.
-* Surface the failure to the caller if no healthy proxies remain.
-
-### Concurrency
-The proxy pool must operate correctly when multiple requests are executed concurrently.
 
 ### Metrics
 Expose runtime statistics for monitoring and debugging:
+
+```ts
+scraper.getMetrics();
+```
+Output:
 ```ts
 {
   proxies: [
@@ -71,13 +80,9 @@ Expose runtime statistics for monitoring and debugging:
       id: "us-west-1",
       requests: 1187,
       failures: 4,
-      state: "cooldown"
+      state: "cooldown",
+      resumeTime: 1680000000
     }
   ]
 }
 ```
-
-## Deliverables
-* Proxy pool implementation.
-* Integration with the existing request execution pipeline.
-* Unit tests covering rotation, failure handling, cooldown recovery, retries, and concurrent request scenarios.
