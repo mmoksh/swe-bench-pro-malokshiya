@@ -195,10 +195,10 @@ index 0000000..d89874c
 +
 +export default ProxyPool;
 diff --git a/lib/utils/request.js b/lib/utils/request.js
-index afaae28..6e47e9d 100644
+index afaae28..1d3bd40 100644
 --- a/lib/utils/request.js
 +++ b/lib/utils/request.js
-@@ -31,6 +31,36 @@ function doRequest (opts, limit) {
+@@ -31,6 +31,39 @@ function doRequest (opts, limit) {
  }
  
  async function request (opts, limit) {
@@ -227,6 +227,9 @@ index afaae28..6e47e9d 100644
 +  } catch (reason) {
 +    debug('Proxy request error:', reason.message);
 +    const err = Error('Proxy error:' + reason.message);
++    if (reason.response && reason.response.statusCode) {
++      err.status = reason.response.statusCode;
++    }
 +    throw err;
 +  }
 +}

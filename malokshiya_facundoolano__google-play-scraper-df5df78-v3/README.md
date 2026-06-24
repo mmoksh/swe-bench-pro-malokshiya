@@ -2,24 +2,23 @@
 
 ## Description
 
-This task requires implementing a proxy pool and rotation subsystem for the google-play-scraper Node.js library. The ProxyPool class must maintain a pool of HTTP/HTTPS proxies, rotate them per request, track proxy health, temporarily disable failing proxies with cooldown, restore health on success, and ensure fair distribution across healthy proxies.
+This task requires implementing a proxy management subsystem for the google-play-scraper library using a JSON envelope proxy model. The solution creates a `createScraper()` factory that wraps scraper methods to route requests through a configurable pool of proxies. Proxies receive POST requests with the original URL/method/body and return a `{proxy, url, data}` envelope. The solution must handle proxy rotation, failure tracking with disabling/cooldown, retry across healthy proxies, and expose runtime metrics via `getMetrics()`.
 
 ## Completion Rates
 
 | Model | Trials | Pass | Fail | Rate |
 |-------|--------|------|------|------|
-| Oracle | 3 | - | - | -% |
-| Opus 4.6 | 5 | - | - | -% |
-| Sonnet 4.6 | 5 | - | - | -% |
-| Avocado | 5 | - | - | -% |
+| Oracle | 3 | 3 | 0 | 100% |
+| Opus 4.6 | 5 | 1 | 4 | 20% |
+| Avocado | 5 | 1 | 4 | 20% |
 
 ## Model Analysis
 
-Pending calibration runs.
+Pending detailed analysis.
 
 ## Anti-Cheating Analysis
 
-- **Hardcoded outputs**: Tests use behavioral assertions against dynamic state (rotation order, failure counts, fairness distribution).
-- **Overfitting to visible tests**: pass_to_pass verifies existing gplay methods remain exported.
-- **Modifying test files**: test_patch applied by the verifier, not the agent.
-- **Bypassing the intended solution path**: Tests access ProxyPool via gplay.ProxyPool and test the class API (add, getProxy, reportSuccess, reportFailure).
+- **Hardcoded outputs**: Tests use nock-mocked proxy endpoints and assert on dynamic metrics (request counts, failure counts, proxy state). No hardcoded output strings.
+- **Overfitting to visible tests**: pass_to_pass verifies existing gplay methods remain exported — orthogonal to proxy pool implementation.
+- **Modifying test files**: test_patch applied by the verifier via config.json, not by the agent.
+- **Bypassing the intended solution path**: Tests verify end-to-end behavior via `createScraper()` and `getMetrics()` — the agent must integrate with the existing request pipeline and correctly unwrap the JSON envelope.
