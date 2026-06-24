@@ -8,14 +8,14 @@ This task requires extending the google-play-scraper library's existing `reviews
 
 | Model | Trials | Pass | Fail | Rate |
 |-------|--------|------|------|------|
-| Oracle | 3 | - | - | -% |
-| Opus 4.6 | 5 | - | - | -% |
-| Sonnet 4.6 | 5 | - | - | -% |
-| Avocado | 5 | - | - | -% |
+| Oracle | 3 | 3 | 0 | 100% |
+| Opus 4.6 | 5 | 1 | 4 | 20% |
+| Sonnet 4.6 | 5 | 5 | 0 | 100% |
+| Avocado | 5 | 0 | 5 | 0% |
 
 ## Model Analysis
 
-Pending calibration runs.
+Opus and Avocado failures were caused by an ambiguous instruction ("Always include the nextCheckpoint in the response") which models interpreted as unconditional, while the test expected nextCheckpoint only when the checkpoint option was provided. Instruction was clarified; revalidation pending.
 
 ## Anti-Cheating Analysis
 

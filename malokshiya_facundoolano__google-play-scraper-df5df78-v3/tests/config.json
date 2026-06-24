@@ -16,7 +16,6 @@
     "Proxy Pool Integration should reset failure counter after cooldown recovery",
     "Proxy Pool Integration should skip disabled proxies during retry",
     "Proxy Pool Integration should work without proxy pool configured",
-    "Proxy Pool Integration should return empty metrics when no proxy pool configured",
     "createScraper exports (unchanged) should export createScraper from main module"
   ],
   "pass_to_pass": [

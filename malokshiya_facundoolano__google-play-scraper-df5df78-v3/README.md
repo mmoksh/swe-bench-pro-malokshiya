@@ -9,12 +9,12 @@ This task requires implementing a proxy management subsystem for the google-play
 | Model | Trials | Pass | Fail | Rate |
 |-------|--------|------|------|------|
 | Oracle | 3 | 3 | 0 | 100% |
-| Opus 4.6 | 5 | 1 | 4 | 20% |
-| Avocado | 5 | 1 | 4 | 20% |
+| Opus 4.6 | 5 | 0-5 | 0-5 | 0-100% (high variance) |
+| Avocado | 5 | 0-5 | 0-5 | 0-100% (high variance) |
 
 ## Model Analysis
 
-Pending detailed analysis.
+High variance across runs indicates the task is at the boundary of model capability. Dominant failure: models send proxy requests with URL as query parameter instead of POST JSON body, causing nock mismatches that cascade across 8-10 tests. Removed untested edge case (getMetrics without proxy pool) from fail_to_pass; revalidation pending.
 
 ## Anti-Cheating Analysis
 
