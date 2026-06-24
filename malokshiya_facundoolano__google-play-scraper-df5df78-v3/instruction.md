@@ -37,6 +37,15 @@ scraper.app({appId: 'com.google.android.apps.translate'})
 ```
 Where `proxy` is the URL of the proxy that processed the request, `url` is the URL of the Google Play API, and `data` is the response from the Google Play API.
 
+* To use a proxy, send a POST request to the proxy's URL with a JSON body containing:
+```json
+{
+  "url": "https://play.google.com/...",
+  "method": "GET",
+  "headers": {}
+}
+```
+
 ## Requirements
 When a list of proxies is provided, the scraper should send the requests through the proxies, not directly to Google Play. The current scrapper API should still return the same response as before, but the response should be fetched from the proxy, not directly from Google Play, unless no proxies are provided, in that case, the scraper should fall back to the original behavior.
 
