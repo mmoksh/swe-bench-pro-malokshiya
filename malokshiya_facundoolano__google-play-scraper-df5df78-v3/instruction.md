@@ -42,7 +42,8 @@ When a list of proxies is provided, the scraper should send the requests through
 A request should be considered failed when:
 * The connection to the proxy cannot be established.
 * The request times out.
-* The proxy returns an error.
+* The proxy returns a transport-level error.
+* HTTP error responses (e.g., 404, 500) from a proxy are NOT proxy failures — the proxy successfully forwarded the upstream response. Do not retry or count these against the proxy's failure counter.
 
 Each proxy must maintain an independent failure counter.
 ### Proxy Disabling
