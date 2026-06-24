@@ -27,10 +27,18 @@ scraper.app({appId: 'com.google.android.apps.translate'})
 ```
 
 ## Assumptions
-* Assume each proxy is a web server that accepts HTTP requests, and it returns the same response as the Google Play API. So instead of making a request to `https://play.google.com/store/apps/details?id=com.google.android.apps.translate`, you make a request to `http://proxy1/store/apps/details?id=com.google.android.apps.translate`.
+* Assume each proxy is a web server that accepts HTTP requests, and it returns a JSON object with the following structure:
+```json
+{
+  "proxy": "http://proxy1",
+  "url": "https://play.google.com/store/apps/details?id=com.google.android.apps.translate",
+  "data": {}
+}
+```
+Where `proxy` is the URL of the proxy that processed the request, `url` is the URL of the Google Play API, and `data` is the response from the Google Play API.
 
 ## Requirements
-When a list of proxies is provided, the scraper should send the requests through the proxies, not directly to Google Play.
+When a list of proxies is provided, the scraper should send the requests through the proxies, not directly to Google Play. The current scrapper API should still return the same response as before, but the response should be fetched from the proxy, not directly from Google Play, unless no proxies are provided, in that case, the scraper should fall back to the original behavior.
 
 ### Proxy Rotation
 * Maintain a pool of configured proxies.

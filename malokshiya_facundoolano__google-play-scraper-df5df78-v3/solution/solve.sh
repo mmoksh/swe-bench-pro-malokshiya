@@ -78,10 +78,10 @@ index 0000000..566222f
 +export default createScraper;
 diff --git a/lib/proxyPool.js b/lib/proxyPool.js
 new file mode 100644
-index 0000000..bb2484c
+index 0000000..d89874c
 --- /dev/null
 +++ b/lib/proxyPool.js
-@@ -0,0 +1,105 @@
+@@ -0,0 +1,112 @@
 +const PLAY_STORE_BASE = 'https://play.google.com';
 +
 +class ProxyPool {
@@ -154,10 +154,9 @@ index 0000000..bb2484c
 +    };
 +  }
 +
-+  async executeWithRetry (requestFn, opts) {
++  async executeWithRetry (doRequest, opts) {
 +    const tried = [];
 +    let lastError;
-+    const originalUrl = opts.url || '';
 +
 +    while (true) {
 +      const proxy = this._select(tried);
@@ -166,14 +165,22 @@ index 0000000..bb2484c
 +      }
 +      tried.push(proxy.id);
 +
-+      const proxyOpts = Object.assign({}, opts, {
-+        url: originalUrl.replace(PLAY_STORE_BASE, proxy.url)
-+      });
-+
 +      try {
-+        const result = await requestFn(proxyOpts, opts.throttle);
++        const proxyReqOpts = {
++          url: proxy.url,
++          method: 'POST',
++          json: {
++            url: opts.url,
++            method: opts.method || 'GET',
++            body: opts.body || null,
++            headers: opts.headers || {}
++          },
++          responseType: 'json'
++        };
++
++        const envelope = await doRequest(proxyReqOpts);
 +        this._recordSuccess(proxy.id);
-+        return result;
++        return envelope.data;
 +      } catch (err) {
 +        if (err.status) {
 +          this._recordSuccess(proxy.id);
@@ -188,10 +195,10 @@ index 0000000..bb2484c
 +
 +export default ProxyPool;
 diff --git a/lib/utils/request.js b/lib/utils/request.js
-index afaae28..2334a16 100644
+index afaae28..6e47e9d 100644
 --- a/lib/utils/request.js
 +++ b/lib/utils/request.js
-@@ -31,6 +31,20 @@ function doRequest (opts, limit) {
+@@ -31,6 +31,36 @@ function doRequest (opts, limit) {
  }
  
  async function request (opts, limit) {
@@ -200,12 +207,28 @@ index afaae28..2334a16 100644
 +    const cleanOpts = Object.assign({}, opts);
 +    delete cleanOpts._proxyPool;
 +    return proxyPool.executeWithRetry(
-+      (proxyOpts) => doRequestWithErrorHandling(proxyOpts, limit),
++      (proxyOpts) => doProxyRequest(proxyOpts, limit),
 +      cleanOpts
 +    );
 +  }
 +
 +  return doRequestWithErrorHandling(opts, limit);
++}
++
++async function doProxyRequest (opts, limit) {
++  debug('Making proxy request: %j', opts);
++  try {
++    const response = await doRequest(opts, limit);
++    debug('Proxy request finished');
++    if (typeof response === 'string') {
++      return JSON.parse(response);
++    }
++    return response;
++  } catch (reason) {
++    debug('Proxy request error:', reason.message);
++    const err = Error('Proxy error:' + reason.message);
++    throw err;
++  }
 +}
 +
 +async function doRequestWithErrorHandling (opts, limit) {
