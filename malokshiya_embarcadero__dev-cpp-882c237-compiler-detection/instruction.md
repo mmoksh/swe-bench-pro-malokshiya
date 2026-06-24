@@ -14,8 +14,8 @@ A user reports that Dev-C++ fails to detect an installed GCC/MinGW compiler.
 * Reinstalled MinGW
 * Verified GCC is installed
 * Restarted the system
-
 The issue persists.
+
 ## Expected Behavior
 When Dev-C++ starts, it should automatically discover supported GCC-based toolchains available on the system and configure a usable compiler profile.
 
@@ -29,10 +29,9 @@ Examples include:
 Dev-C++ reports that no compiler is available even though a valid GCC installation exists.
 
 ## Requirements
-1. Investigate how Dev-C++ discovers and registers compilers.
+1. Investigate how Dev-C++ discovers and registers compilers, and how the PATH environment variable is read/assembled when UseOriginal is not set.
 2. Identify all compiler detection paths currently supported.
-3. Reproduce the issue using a clean Windows environment.
-4. Determine why valid MinGW/GCC installations are not detected.
-5. Implement a robust fix.
+3. Determine why valid MinGW/GCC installations are not detected.
+4. Implement a robust fix.
 5. The fix must not break existing Dev-C++ compiler profiles or previously supported detection workflows.
 6. The fix must not require any user intervention or configuration changes.
