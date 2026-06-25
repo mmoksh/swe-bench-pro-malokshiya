@@ -183,16 +183,15 @@ def test_fpc_path_read_simulation():
     assert third_arg is not None, f"Cannot parse 3rd arg from: {getenv_line}"
 
     buf_match = re.search(
-        r"OldPath\s*:\s*array\s*\[\s*(\d+)\s*\.\.\s*(\d+)\s*\]\s*of\s*(\w+)",
+        r"(\w+)\s*:\s*array\s*\[\s*(\d+)\s*\.\.\s*(\d+)\s*\]\s*of\s*(\w+)",
         impl,
         re.IGNORECASE,
     )
-    assert buf_match is not None, (
-        "OldPath array declaration not found in SetPath. "
-        "If the buffer was restructured, the GetEnvironmentVariable call "
-        "with a 3-arg buffer pattern should also have been removed."
-    )
-    lo, hi = int(buf_match.group(1)), int(buf_match.group(2))
+    if buf_match is None:
+        assert_else_branch_reads_path(impl)
+        return
+    var_name = buf_match.group(1)
+    lo, hi = int(buf_match.group(2)), int(buf_match.group(3))
     expected_count = hi - lo + 1
 
     pas_src = f"""\
@@ -216,7 +215,7 @@ begin
 end;
 
 var
-  OldPath: array[{lo}..{hi}] of Char;
+  {var_name}: array[{lo}..{hi}] of Char;
   bufSize: Integer;
   resultStr: String;
 begin
@@ -227,14 +226,14 @@ begin
     Halt(1);
   end;
 
-  if bufSize > Length(OldPath) then begin
+  if bufSize > Length({var_name}) then begin
     WriteLn('FAIL: bufSize=', bufSize, ' exceeds array capacity=',
-            Length(OldPath), ' — buffer overflow would corrupt PATH');
+            Length({var_name}), ' — buffer overflow would corrupt PATH');
     Halt(1);
   end;
 
-  SimGetEnv(@OldPath, bufSize);
-  resultStr := String(OldPath);
+  SimGetEnv(@{var_name}, bufSize);
+  resultStr := String({var_name});
 
   if Pos('MinGW', resultStr) = 0 then begin
     WriteLn('FAIL: PATH content lost — "MinGW" not found after read');
