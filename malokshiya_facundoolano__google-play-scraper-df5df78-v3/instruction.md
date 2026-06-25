@@ -71,7 +71,6 @@ Each proxy must maintain an independent failure counter.
 * A disabled proxy remains unavailable for `cooldownMs`.
 * After the cooldown period expires, the proxy automatically becomes eligible for selection again.
 * The proxy's failure counter should be reset when it re-enters rotation.
-* Recovery is evaluated lazily — a proxy becomes eligible again when the pool is next queried for proxy selection or metrics.
 
 ### Retry Behavior
 If a request fails because of a proxy failure:
