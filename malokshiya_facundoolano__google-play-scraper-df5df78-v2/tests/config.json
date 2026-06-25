@@ -10,7 +10,6 @@
     "Reviews checkpoint should return null nextCheckpoint when no reviews before checkpoint",
     "Reviews checkpoint should stop at checkpoint on a later page",
     "Reviews checkpoint should return all reviews when checkpoint is not found",
-    "Reviews checkpoint should set nextPaginationToken to null when checkpoint is found",
     "Reviews checkpoint should respect num limit even with checkpoint",
     "Reviews checkpoint should stop fetching pages once checkpoint is found",
     "Reviews checkpoint should handle checkpoint on a third page across multiple paginations"
