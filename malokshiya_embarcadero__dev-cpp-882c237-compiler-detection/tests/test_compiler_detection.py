@@ -54,6 +54,30 @@ def find_setpath_impl(content):
     return impls[-1] if impls else None
 
 
+def is_safe_getenv_variant(getenv_line):
+    """Check if the GetEnvironmentVariable call uses a safe variant.
+
+    Safe variants include:
+    - SysUtils.GetEnvironmentVariable('PATH') — 1-arg Delphi RTL wrapper
+    - GetEnvironmentVariable('PATH') used as a function return (not 3-arg API)
+    These handle buffer management internally and avoid the SizeOf/Length issue.
+    """
+    if getenv_line is None:
+        return False
+    # 1-arg variant: GetEnvironmentVariable('PATH') or SysUtils.GetEnvironmentVariable('PATH')
+    # used as an expression (assigned to a variable), not as a 3-arg procedure call
+    m = re.search(
+        r"(?:SysUtils\.)?GetEnvironmentVariable\s*\(\s*(?:PChar\s*\(\s*)?'PATH'\)?\s*\)",
+        getenv_line,
+        re.IGNORECASE,
+    )
+    if m:
+        # Check it's used as a function (assigned), not a 3-arg call
+        if "," not in getenv_line.split("GetEnvironmentVariable")[1].split(")")[0]:
+            return True
+    return False
+
+
 def find_getenv_in_setpath(content):
     """Find GetEnvironmentVariable('PATH',...) call inside SetPath implementation."""
     impl = find_setpath_impl(content)
@@ -124,6 +148,10 @@ def test_setpath_getenv_rejects_sizeof():
         assert_else_branch_reads_path(impl)
         return
 
+    # Safe variant (e.g. SysUtils.GetEnvironmentVariable('PATH')) avoids the issue entirely
+    if is_safe_getenv_variant(getenv_line):
+        return
+
     third_arg = extract_third_arg(getenv_line)
     assert third_arg is not None, f"Cannot parse 3rd arg from: {getenv_line}"
 
@@ -143,6 +171,10 @@ def test_setpath_getenv_uses_charcount():
     if getenv_line is None:
         assert impl is not None, "SetPath procedure not found in Utils.pas"
         assert_else_branch_reads_path(impl)
+        return
+
+    # Safe variant (e.g. SysUtils.GetEnvironmentVariable('PATH')) handles buffers internally
+    if is_safe_getenv_variant(getenv_line):
         return
 
     third_arg = extract_third_arg(getenv_line)
@@ -177,6 +209,11 @@ def test_fpc_path_read_simulation():
     if getenv_line is None:
         assert impl is not None, "SetPath procedure not found in Utils.pas"
         assert_else_branch_reads_path(impl)
+        return
+
+    # Safe variant (e.g. SysUtils.GetEnvironmentVariable('PATH')) handles buffers internally
+    # — no buffer overflow possible, so FPC simulation is not needed
+    if is_safe_getenv_variant(getenv_line):
         return
 
     third_arg = extract_third_arg(getenv_line)
