@@ -26,7 +26,8 @@ Examples include:
 * Existing compiler configurations from previous installations
 
 ## Actual Behavior
-Dev-C++ reports that no compiler is available even though a valid GCC installation exists.
+* The compiler's directory IS present in the system PATH environment variable. Manually running gcc --version from a Windows command prompt works. However, Dev-C++ reports that no compiler is available even though a valid GCC installation exists.
+* Dev-C++ detects compilers only on fresh Windows installations with short PATH variables.
 
 ## Requirements
 1. Investigate how Dev-C++ discovers and registers compilers, and how the PATH environment variable is read/assembled when UseOriginal is not set.

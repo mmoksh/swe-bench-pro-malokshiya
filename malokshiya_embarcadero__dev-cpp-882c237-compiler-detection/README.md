@@ -11,21 +11,19 @@ This task is non-trivial because the model must: (1) trace compiler detection th
 | Model | Agent | Trials | Pass Rate |
 |-------|-------|--------|-----------|
 | Oracle | oracle | 3/3 | 100% |
-| Opus 4.6 | claude-code | 0/5 | 0% |
-| Sonnet 4.6 | claude-code | 0/5 | 0% |
+| Opus 4.6 | claude-code | 5/5 | 100% |
+| Sonnet 4.6 | claude-code | 5/5 | 100% |
 | Avocado | metacode | 4/5 | 80% |
 
 ## Model Analysis
 
-**Opus 4.6 (0/5):** All 5 trials expanded `FindSets` in `devCFG.pas` to search additional MinGW locations (TDM-GCC-64, TDM-GCC-32, common system paths, PATH scanning). None identified the `SizeOf`/`Length` bug in `SetPath` or switched to `SysUtils.GetEnvironmentVariable`.
+**Opus 4.6 (5/5):** All 5 trials correctly traced the bug to `SetPath` in `Utils.pas` and replaced the 3-arg `GetEnvironmentVariable` call with `SysUtils.GetEnvironmentVariable('PATH')`, avoiding the buffer overflow entirely. The instruction hint about long PATH variables guided Opus to investigate PATH reading rather than expanding search paths.
 
-**Sonnet 4.6 (0/5):** Same pattern as Opus — all trials focused on expanding compiler search paths rather than investigating PATH handling. Never touches `Utils.pas`.
+**Sonnet 4.6 (5/5):** Same successful pattern as Opus — the long PATH hint was sufficient to redirect investigation from `FindSets` in `devCFG.pas` to `SetPath` in `Utils.pas`.
 
-**Avocado (4/5):** 4 trials correctly fixed the bug — either by changing `SizeOf(OldPath)` → `Length(OldPath)`, or by replacing the 3-arg Windows API call with the safer `SysUtils.GetEnvironmentVariable('PATH')` wrapper. The 1 failure did not find the `SetPath` bug and only modified `devCFG.pas` (same failure mode as Claude models).
+**Avocado (4/5):** 4 trials correctly fixed the bug — either by changing `SizeOf(OldPath)` → `Length(OldPath)`, or by replacing the 3-arg Windows API call with the safer `SysUtils.GetEnvironmentVariable('PATH')` wrapper. The 1 failure did not find the `SetPath` bug and only modified `devCFG.pas`.
 
-**Dominant failure mode (Claude models, 10/10 failures):** Models correctly identify that compiler detection starts in `FindSets` but never trace through to `SetPath` where the PATH is assembled. They attempt to broaden the search by adding more paths to check, without realizing the existing PATH is being corrupted before it's searched.
-
-These failures reflect reasoning gaps — the models fail to follow the chain: `FindSets` → compiler bin dir → `SetPath` → `GetEnvironmentVariable` → `SizeOf` bug. This is not a task-setup issue.
+**Dominant failure mode (1/15 total failures):** Model correctly identifies that compiler detection starts in `FindSets` but doesn't trace through to `SetPath` where the PATH is assembled. Attempts to broaden the search by adding more paths to check, without realizing the existing PATH is being corrupted before it's searched. This reflects a reasoning gap — failure to follow the chain: `FindSets` → compiler bin dir → `SetPath` → `GetEnvironmentVariable` → buffer bug.
 
 ## Anti-Cheating Analysis
 

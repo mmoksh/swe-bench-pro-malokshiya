@@ -172,13 +172,49 @@ def test_setpath_getenv_uses_charcount():
     )
 
 
+def _run_fpc_program(pas_src, label="test", env=None):
+    """Compile and run a Free Pascal program, returning (success, stdout)."""
+    with tempfile.NamedTemporaryFile(
+        suffix=".pas", mode="w", delete=False, dir="/tmp"
+    ) as f:
+        f.write(pas_src)
+        pas_file = f.name
+
+    exe_file = pas_file.replace(".pas", "")
+
+    try:
+        comp = subprocess.run(
+            ["fpc", "-Mdelphi", pas_file, "-o" + exe_file],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        assert (
+            comp.returncode == 0
+        ), f"FPC compilation failed for {label}:\n{comp.stderr}"
+
+        run = subprocess.run(
+            [exe_file], capture_output=True, text=True, timeout=10, env=env
+        )
+        return run.returncode == 0, run.stdout.strip()
+    finally:
+        for path in [pas_file, exe_file]:
+            if os.path.exists(path):
+                os.unlink(path)
+
+
 def test_fpc_path_read_simulation():
     """Simulate PATH reading with FPC to verify the buffer size doesn't cause overflow.
 
     Compiles a Free Pascal program in {$mode delphiunicode} (Char=WideChar)
-    that: (1) evaluates the buffer size expression from Utils.pas,
-    (2) verifies it doesn't exceed the array capacity, and
-    (3) simulates reading a long PATH string to confirm content is preserved.
+    that verifies a long PATH (2100+ chars containing 'MinGW') is preserved.
+
+    For the 3-arg GetEnvironmentVariable pattern: evaluates the buffer size
+    expression and simulates the read with a fake long PATH.
+
+    For the SysUtils wrapper pattern: sets a real environment variable to a
+    long PATH and calls SysUtils.GetEnvironmentVariable to verify it's read
+    correctly.
     """
     content = read_utils()
     getenv_line, impl = find_getenv_in_setpath(content)
@@ -189,11 +225,50 @@ def test_fpc_path_read_simulation():
         return
 
     third_arg = extract_third_arg(getenv_line)
+
     if third_arg is None:
-        # Not a 3-arg call — fall through to else-branch check
+        # Not a 3-arg call (e.g. SysUtils wrapper) — verify it actually
+        # handles long PATH strings by setting a real env var and reading it
         assert_else_branch_reads_path(impl)
+
+        pas_src = """\
+program test_sysutils_long_path;
+{$mode delphiunicode}
+uses SysUtils;
+var
+  resultStr: String;
+begin
+  resultStr := SysUtils.GetEnvironmentVariable('TEST_LONG_PATH');
+
+  if Length(resultStr) < 2000 then begin
+    WriteLn('FAIL: resultStr too short: ', Length(resultStr), ' chars');
+    Halt(1);
+  end;
+
+  if Pos('MinGW', resultStr) = 0 then begin
+    WriteLn('FAIL: PATH content lost - "MinGW" not found');
+    WriteLn('  resultLen=', Length(resultStr));
+    Halt(1);
+  end;
+
+  WriteLn('PASS: long PATH preserved (', Length(resultStr), ' chars, contains MinGW)');
+  Halt(0);
+end.
+"""
+        long_path = "C:\\MinGW\\bin;C:\\Windows\\system32;C:\\Windows;" + "X" * 2100
+        test_env = os.environ.copy()
+        test_env["TEST_LONG_PATH"] = long_path
+
+        success, output = _run_fpc_program(
+            pas_src, label="SysUtils long PATH", env=test_env
+        )
+        assert success, (
+            f"SysUtils.GetEnvironmentVariable failed to preserve long PATH:\n"
+            f"{output}"
+        )
         return
 
+    # 3-arg call — use the buffer simulation
     buf_match = re.search(
         r"(\w+)\s*:\s*array\s*\[\s*(\d+)\s*\.\.\s*(\d+)\s*\]\s*of\s*(\w+)",
         impl,
@@ -258,34 +333,10 @@ begin
   Halt(0);
 end.
 """
-    with tempfile.NamedTemporaryFile(
-        suffix=".pas", mode="w", delete=False, dir="/tmp"
-    ) as f:
-        f.write(pas_src)
-        pas_file = f.name
-
-    exe_file = pas_file.replace(".pas", "")
-
-    try:
-        comp = subprocess.run(
-            ["fpc", "-Mdelphi", pas_file, "-o" + exe_file],
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        assert (
-            comp.returncode == 0
-        ), f"FPC compilation failed for expression '{third_arg}':\n{comp.stderr}"
-
-        run = subprocess.run([exe_file], capture_output=True, text=True, timeout=10)
-        assert run.returncode == 0, (
-            f"PATH read simulation failed with expression '{third_arg}':\n"
-            f"{run.stdout.strip()}"
-        )
-    finally:
-        for path in [pas_file, exe_file]:
-            if os.path.exists(path):
-                os.unlink(path)
+    success, output = _run_fpc_program(pas_src, label=f"buffer size '{third_arg}'")
+    assert (
+        success
+    ), f"PATH read simulation failed with expression '{third_arg}':\n{output}"
 
 
 # ---------------------------------------------------------------------------
