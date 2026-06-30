@@ -11,19 +11,19 @@ This task is non-trivial because the model must: (1) trace compiler detection th
 | Model | Agent | Trials | Pass Rate |
 |-------|-------|--------|-----------|
 | Oracle | oracle | 3/3 | 100% |
-| Opus 4.6 | claude-code | 5/5 | 100% |
-| Sonnet 4.6 | claude-code | 5/5 | 100% |
-| Avocado | metacode | 4/5 | 80% |
+| Opus 4.6 | claude-code | 5/10 | 50% |
+| Sonnet 4.6 | claude-code | 6/10 | 60% |
+| Avocado | metacode | 7/10 | 70% |
 
 ## Model Analysis
 
-**Opus 4.6 (5/5):** All 5 trials correctly traced the bug to `SetPath` in `Utils.pas` and replaced the 3-arg `GetEnvironmentVariable` call with `SysUtils.GetEnvironmentVariable('PATH')`, avoiding the buffer overflow entirely. The instruction hint about long PATH variables guided Opus to investigate PATH reading rather than expanding search paths.
+**Opus 4.6 (5/10):** High variance. When successful, Opus traces the bug to `SetPath` in `Utils.pas` and replaces the 3-arg `GetEnvironmentVariable` call with `SysUtils.GetEnvironmentVariable('PATH')`. When unsuccessful, Opus focuses on expanding `FindSets` search paths in `devCFG.pas` without investigating PATH reading.
 
-**Sonnet 4.6 (5/5):** Same successful pattern as Opus — the long PATH hint was sufficient to redirect investigation from `FindSets` in `devCFG.pas` to `SetPath` in `Utils.pas`.
+**Sonnet 4.6 (6/10):** Similar variance. Successful trials find `SetPath` and apply the SysUtils wrapper or fix the buffer size. Failures focus on `devCFG.pas` search path expansion.
 
-**Avocado (4/5):** 4 trials correctly fixed the bug — either by changing `SizeOf(OldPath)` → `Length(OldPath)`, or by replacing the 3-arg Windows API call with the safer `SysUtils.GetEnvironmentVariable('PATH')` wrapper. The 1 failure did not find the `SetPath` bug and only modified `devCFG.pas`.
+**Avocado (7/10):** Most consistent. Successful trials either change `SizeOf(OldPath)` → `Length(OldPath)` or use the `SysUtils.GetEnvironmentVariable('PATH')` wrapper. Failures don't trace past `FindSets`.
 
-**Dominant failure mode (1/15 total failures):** Model correctly identifies that compiler detection starts in `FindSets` but doesn't trace through to `SetPath` where the PATH is assembled. Attempts to broaden the search by adding more paths to check, without realizing the existing PATH is being corrupted before it's searched. This reflects a reasoning gap — failure to follow the chain: `FindSets` → compiler bin dir → `SetPath` → `GetEnvironmentVariable` → buffer bug.
+**Dominant failure mode (12/30 total failures):** Models correctly identify that compiler detection starts in `FindSets` but don't trace through to `SetPath` where the PATH is assembled. They expand search paths in `devCFG.pas` without realizing the existing PATH is being corrupted before it's searched. This reflects a reasoning gap — failure to follow the chain: `FindSets` → compiler bin dir → `SetPath` → `GetEnvironmentVariable` → buffer bug.
 
 ## Anti-Cheating Analysis
 
