@@ -2,6 +2,8 @@ version = "1.0"
 
 [task]
 name = "codimango/malokshiya_embarcadero__dev-cpp-882c237-compiler-detection"
+format = "swe_bench_single_turn"
+workstream = "swe_public_repo"
 authors = [{ name = "Mohammed Alokshiya", email = "malokshiya@meta.com" }]
 keywords = ["pascal", "delphi", "bug-fix", "compiler-detection"]
 

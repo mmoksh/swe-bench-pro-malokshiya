@@ -2,6 +2,8 @@ version = "1.0"
 
 [task]
 name = "codimango/malokshiya_facundoolano__google-play-scraper-df5df78-v3"
+format = "swe_bench_single_turn"
+workstream = "swe_public_repo"
 authors = [{ name = "Mohammed Alokshiya", email = "malokshiya@meta.com" }]
 keywords = ["javascript", "feature-implementation", "proxy-pool", "networking"]
 
