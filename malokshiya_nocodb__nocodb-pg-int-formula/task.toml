@@ -2,6 +2,8 @@ version = "1.0"
 
 [task]
 name = "codimango/malokshiya_nocodb__nocodb-pg-int-formula"
+format = "swe_bench_single_turn"
+workstream = "swe_public_repo"
 authors = [{ name = "Mohammed Alokshiya", email = "malokshiya@meta.com" }]
 keywords = ["typescript", "bug-fix", "async-await", "sql-generation", "nocodb"]
 
