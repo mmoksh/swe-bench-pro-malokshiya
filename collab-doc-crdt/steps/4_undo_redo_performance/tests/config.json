@@ -63,5 +63,10 @@
     "tests/test_3_offline_crash_recovery.py",
     "tests/test_4_undo_redo_performance.py"
   ],
-  "before_repo_set_cmd": ""
+  "before_repo_set_cmd": "",
+  "repo": "",
+  "base_commit": "0000000000000000000000000000000000000000",
+  "instance_id": "collab-doc-crdt_4_undo_redo_performance",
+  "patch": "",
+  "test_patch": ""
 }

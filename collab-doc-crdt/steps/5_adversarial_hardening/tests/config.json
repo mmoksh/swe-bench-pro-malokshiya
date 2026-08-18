@@ -79,5 +79,10 @@
     "tests/test_4_undo_redo_performance.py",
     "tests/test_5_adversarial_hardening.py"
   ],
-  "before_repo_set_cmd": ""
+  "before_repo_set_cmd": "",
+  "repo": "",
+  "base_commit": "0000000000000000000000000000000000000000",
+  "instance_id": "collab-doc-crdt_5_adversarial_hardening",
+  "patch": "",
+  "test_patch": ""
 }

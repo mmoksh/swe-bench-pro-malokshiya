@@ -81,5 +81,7 @@
     "tests/test_4_undo_redo_performance.py",
     "tests/test_5_adversarial_hardening.py"
   ],
-  "before_repo_set_cmd": ""
+  "before_repo_set_cmd": "",
+  "patch": "",
+  "test_patch": ""
 }
