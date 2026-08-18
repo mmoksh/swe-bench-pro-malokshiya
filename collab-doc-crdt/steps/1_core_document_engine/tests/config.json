@@ -27,6 +27,6 @@
   "repo": "",
   "base_commit": "0000000000000000000000000000000000000000",
   "instance_id": "collab-doc-crdt_1_core_document_engine",
-  "patch": "",
-  "test_patch": ""
+  "patch": "diff --git a/.placeholder b/.placeholder\nnew file mode 100644\nindex 0000000..a3d8f7e\n--- /dev/null\n+++ b/.placeholder\n@@ -0,0 +1 @@\n+# placeholder for greenfield task\n",
+  "test_patch": "diff --git a/tests/.placeholder b/tests/.placeholder\nnew file mode 100644\nindex 0000000..a3d8f7e\n--- /dev/null\n+++ b/tests/.placeholder\n@@ -0,0 +1 @@\n+# placeholder test for greenfield task\n"
 }
