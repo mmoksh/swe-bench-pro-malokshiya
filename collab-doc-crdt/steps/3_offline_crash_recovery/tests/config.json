@@ -50,5 +50,10 @@
     "tests/test_2_multi_client_sync.py",
     "tests/test_3_offline_crash_recovery.py"
   ],
-  "before_repo_set_cmd": ""
+  "before_repo_set_cmd": "",
+  "repo": "",
+  "base_commit": "0000000000000000000000000000000000000000",
+  "instance_id": "collab-doc-crdt_3_offline_crash_recovery",
+  "patch": "",
+  "test_patch": ""
 }

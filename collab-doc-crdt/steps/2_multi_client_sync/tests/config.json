@@ -38,5 +38,10 @@
     "tests/test_1_core_document_engine.py",
     "tests/test_2_multi_client_sync.py"
   ],
-  "before_repo_set_cmd": ""
+  "before_repo_set_cmd": "",
+  "repo": "",
+  "base_commit": "0000000000000000000000000000000000000000",
+  "instance_id": "collab-doc-crdt_2_multi_client_sync",
+  "patch": "",
+  "test_patch": ""
 }
