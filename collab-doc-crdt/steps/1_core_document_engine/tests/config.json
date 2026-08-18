@@ -1,0 +1,27 @@
+{
+  "fail_to_pass": [
+    "tests/test_1_core_document_engine.py::test_new_document",
+    "tests/test_1_core_document_engine.py::test_insert_single",
+    "tests/test_1_core_document_engine.py::test_insert_ordering",
+    "tests/test_1_core_document_engine.py::test_insert_after",
+    "tests/test_1_core_document_engine.py::test_delete",
+    "tests/test_1_core_document_engine.py::test_delete_unknown",
+    "tests/test_1_core_document_engine.py::test_duplicate_element_id",
+    "tests/test_1_core_document_engine.py::test_insert_after_unknown",
+    "tests/test_1_core_document_engine.py::test_get_not_found",
+    "tests/test_1_core_document_engine.py::test_format_empty",
+    "tests/test_1_core_document_engine.py::test_status",
+    "tests/test_1_core_document_engine.py::test_persistence_across_invocations",
+    "tests/test_1_core_document_engine.py::test_empty_value",
+    "tests/test_1_core_document_engine.py::test_special_characters",
+    "tests/test_1_core_document_engine.py::test_many_operations",
+    "tests/test_1_core_document_engine.py::test_combined_workflow",
+    "tests/test_1_core_document_engine.py::test_large_document",
+    "tests/test_1_core_document_engine.py::test_idempotent_recovery"
+  ],
+  "pass_to_pass": [],
+  "selected_test_files_to_run": [
+    "tests/test_1_core_document_engine.py"
+  ],
+  "before_repo_set_cmd": ""
+}
