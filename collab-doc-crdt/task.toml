@@ -1,0 +1,89 @@
+schema_version = "1.1"
+
+[task]
+name = "codimango/collab-doc-crdt"
+description = "Build a local-first collaborative document system using CRDTs for concurrent rich-text editing in Rust"
+authors = []
+keywords = ["crdt", "collaborative-editing", "rust", "local-first", "distributed-systems"]
+format = "swe_bench_multi_turn"
+workstream = "swe_public_repo"
+
+[metadata]
+difficulty = "hard"
+category = "iterate_on_feature"
+author_name = "Mohammed Alokshiya"
+author_email = "malokshiya@meta.com"
+tags = ["multi-turn", "swe-bench-long-horizon-track", "crdt", "rust", "distributed-systems", "greenfield"]
+reward_type = "binary"
+category_usecase = "new_library"
+category_subdomain = "distributed_systems"
+
+[environment]
+build_timeout_sec = 900
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240
+gpus = 0
+allow_internet = true
+mcp_servers = []
+
+[environment.env]
+
+[[steps]]
+name = "1_core_document_engine"
+dependencies = []
+min_reward = 1.0
+
+[steps.verifier]
+timeout_sec = 600.0
+
+[steps.agent]
+timeout_sec = 900.0
+
+[[steps]]
+name = "2_multi_client_sync"
+dependencies = ["1_core_document_engine"]
+min_reward = 1.0
+inherit_prior_session = true
+
+[steps.verifier]
+timeout_sec = 600.0
+
+[steps.agent]
+timeout_sec = 900.0
+
+[[steps]]
+name = "3_offline_crash_recovery"
+dependencies = ["2_multi_client_sync"]
+min_reward = 1.0
+inherit_prior_session = true
+
+[steps.verifier]
+timeout_sec = 600.0
+
+[steps.agent]
+timeout_sec = 900.0
+
+[[steps]]
+name = "4_undo_redo_performance"
+dependencies = ["3_offline_crash_recovery"]
+min_reward = 1.0
+inherit_prior_session = true
+
+[steps.verifier]
+timeout_sec = 600.0
+
+[steps.agent]
+timeout_sec = 900.0
+
+[[steps]]
+name = "5_adversarial_hardening"
+dependencies = ["4_undo_redo_performance"]
+min_reward = 1.0
+inherit_prior_session = true
+
+[steps.verifier]
+timeout_sec = 600.0
+
+[steps.agent]
+timeout_sec = 900.0
