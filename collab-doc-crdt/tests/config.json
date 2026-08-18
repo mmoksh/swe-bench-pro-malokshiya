@@ -1,4 +1,7 @@
 {
+  "repo": "",
+  "base_commit": "0000000000000000000000000000000000000000",
+  "instance_id": "collab-doc-crdt_final",
   "fail_to_pass": [
     "tests/test_1_core_document_engine.py::test_new_document",
     "tests/test_1_core_document_engine.py::test_insert_single",

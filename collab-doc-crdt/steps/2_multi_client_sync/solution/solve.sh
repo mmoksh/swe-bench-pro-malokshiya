@@ -49,11 +49,6 @@ else
     cp "$SRC_DIR/collab-doc-bin" target/release/collab-doc
     chmod +x target/release/collab-doc
     echo "Used fallback binary"
-  elif [ -f "/tmp/collab-doc-oracle/target/release/collab-doc" ]; then
-    mkdir -p target/release
-    cp /tmp/collab-doc-oracle/target/release/collab-doc target/release/
-    chmod +x target/release/collab-doc
-    echo "Used /tmp fallback"
   else
     echo "No fallback binary found, failing"
     exit 1
