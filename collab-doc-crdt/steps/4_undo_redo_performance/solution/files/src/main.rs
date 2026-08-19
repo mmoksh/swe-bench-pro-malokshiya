@@ -21,7 +21,6 @@ enum Commands {
     New {
         document: String,
     },
-
     /// Insert an element into a document
     Insert {
         document: String,
@@ -34,7 +33,6 @@ enum Commands {
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Delete an element from a document
     Delete {
         document: String,
@@ -43,7 +41,6 @@ enum Commands {
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Retrieve an element by ID
     Get {
         document: String,
@@ -52,19 +49,16 @@ enum Commands {
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Print the complete document in logical order
     Format {
         document: String,
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Report basic document state
     Status {
         document: String,
     },
-
     /// Sync operations from one client to another
     Sync {
         document: String,
@@ -73,28 +67,24 @@ enum Commands {
         #[arg(long)]
         to: String,
     },
-
     /// Merge operations from multiple clients
     Merge {
         document: String,
         #[arg(long)]
         clients: String,
     },
-
     /// List operations
     Log {
         document: String,
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Save snapshot
     Save {
         document: String,
         #[arg(long)]
         path: String,
     },
-
     /// Load from snapshot
     Load {
         #[arg(long)]
@@ -103,32 +93,31 @@ enum Commands {
         #[arg(long = "doc-id")]
         doc_id: String,
     },
-
     /// Undo last operation for client
     Undo {
         document: String,
         #[arg(long)]
         client: String,
     },
-
     /// Redo last undone operation for client
     Redo {
         document: String,
         #[arg(long)]
         client: String,
     },
-
     /// Garbage collect tombstones
     Gc {
         document: String,
     },
-
     /// Compact (alias for gc)
     Compact {
         document: String,
     },
+    /// Verify document integrity
+    Verify {
+        document: String,
+    },
 }
-
 
 fn run() -> Result<(), error::DocError> {
     let cli = Cli::parse();
@@ -353,7 +342,17 @@ fn run() -> Result<(), error::DocError> {
             persistence::clear_wal(&doc_name)?;
             persistence::save_document(&doc)?;
             Ok(())
-        }    }
+        }
+        Commands::Verify { document: doc_name } => {
+            persistence::validate_doc_name(&doc_name)?;
+            let doc = persistence::load_document(&doc_name)?;
+            doc.verify()?;
+            println!("OK: document '{}' is healthy", doc_name);
+            println!("elements: {}", doc.status().0);
+            println!("tombstones: {}", doc.tombstone_count());
+            Ok(())
+        }
+    }
 }
 
 fn main() {

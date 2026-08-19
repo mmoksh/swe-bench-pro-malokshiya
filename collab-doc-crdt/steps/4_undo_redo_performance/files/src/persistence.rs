@@ -87,12 +87,11 @@ pub fn save_document(doc: &Document) -> Result<(), DocError> {
     let path = doc_path(&doc.name);
     let tmp_path = dir.join(format!("{}.json.tmp", doc.name));
 
-    let json = serde_json::to_string_pretty(doc)?;
+    let json = serde_json::to_string(doc)?;
     // Write to temp
     {
         let mut f = fs::File::create(&tmp_path)?;
         f.write_all(json.as_bytes())?;
-        f.sync_all()?;
     }
     // Rename atomic on POSIX
     fs::rename(&tmp_path, &path)?;
@@ -125,7 +124,8 @@ pub fn load_document(name: &str) -> Result<Document, DocError> {
                     }
                 } else {
                     match serde_json::from_str::<Document>(&contents) {
-                        Ok(d) => {
+                        Ok(mut d) => {
+                            d.rebuild_index();
                             // Verify integrity after parsing
                             if let Err(verr) = d.verify() {
                                 if w_path.exists() {
@@ -279,7 +279,6 @@ pub fn append_wal(doc_name: &str, op: &Operation) -> Result<(), DocError> {
         .append(true)
         .open(&w_path)?;
     writeln!(file, "{}", json_line)?;
-    file.sync_all()?;
     Ok(())
 }
 
@@ -303,13 +302,12 @@ pub fn save_snapshot(doc: &Document, path: &str) -> Result<(), DocError> {
             fs::create_dir_all(parent)?;
         }
     }
-    let json = serde_json::to_string_pretty(doc)?;
+    let json = serde_json::to_string(doc)?;
     // Atomic write for snapshot too: write to tmp then rename
     let tmp_path = format!("{}.tmp", path);
     {
         let mut f = fs::File::create(&tmp_path)?;
         f.write_all(json.as_bytes())?;
-        f.sync_all()?;
     }
     fs::rename(&tmp_path, p)?;
     Ok(())
@@ -335,6 +333,7 @@ pub fn load_snapshot(path: &str, doc_id: &str) -> Result<Document, DocError> {
     let mut doc: Document = serde_json::from_str(&contents).map_err(|e| {
         DocError::Corruption(format!("snapshot '{}' corrupted: {}", path, e))
     })?;
+    doc.rebuild_index();
     // Validate snapshot integrity via verify
     doc.verify().map_err(|e| {
         DocError::Corruption(format!("snapshot '{}' failed verification: {}", path, e))

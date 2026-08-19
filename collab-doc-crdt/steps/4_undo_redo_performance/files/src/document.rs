@@ -31,6 +31,8 @@ pub struct Document {
     pub undo_stacks: HashMap<String, Vec<Operation>>,
     pub redo_stacks: HashMap<String, Vec<Operation>>,
     pub sync_history: Vec<(String, String)>,
+    #[serde(skip, default = "HashMap::new")]
+    pub order_index: HashMap<String, usize>,
 }
 
 impl Document {
@@ -45,6 +47,14 @@ impl Document {
             undo_stacks: HashMap::new(),
             redo_stacks: HashMap::new(),
             sync_history: Vec::new(),
+            order_index: HashMap::new(),
+        }
+    }
+
+    pub fn rebuild_index(&mut self) {
+        self.order_index.clear();
+        for (idx, id) in self.order.iter().enumerate() {
+            self.order_index.insert(id.clone(), idx);
         }
     }
 
@@ -100,7 +110,7 @@ impl Document {
         }
 
         let after_id = after.as_ref().unwrap();
-        let start = if let Some(pos) = self.order.iter().position(|id| id == after_id) {
+        let start = if let Some(&pos) = self.order_index.get(after_id) {
             pos + 1
         } else {
             self.order.len()
@@ -203,6 +213,11 @@ impl Document {
                     element_id,
                 );
                 self.order.insert(pos, element_id.clone());
+                self.order_index.insert(element_id.clone(), pos);
+                for idx in pos + 1..self.order.len() {
+                    let sid = self.order[idx].clone();
+                    self.order_index.insert(sid, idx);
+                }
 
                 // Push to undo stack and clear redo stack (standard semantics)
                 self.redo_stacks
@@ -383,6 +398,7 @@ impl Document {
 
         // Replace self's order/elements/applied_ops/operations with deterministic rebuilt
         self.order = new_doc.order;
+        self.order_index = new_doc.order_index;
         self.elements = new_doc.elements;
         self.applied_ops = new_doc.applied_ops;
         // Keep sorted operations as canonical order
@@ -644,6 +660,7 @@ impl Document {
             // (e.g., chain of deleted elements). Limit iterations to avoid infinite loop.
             // Continue.
         }
+        self.rebuild_index();
     }
 
     /// Verify document integrity.

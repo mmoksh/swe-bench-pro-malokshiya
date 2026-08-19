@@ -21,7 +21,6 @@ enum Commands {
     New {
         document: String,
     },
-
     /// Insert an element into a document
     Insert {
         document: String,
@@ -34,7 +33,6 @@ enum Commands {
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Delete an element from a document
     Delete {
         document: String,
@@ -43,7 +41,6 @@ enum Commands {
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Retrieve an element by ID
     Get {
         document: String,
@@ -52,20 +49,75 @@ enum Commands {
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Print the complete document in logical order
     Format {
         document: String,
         #[arg(long)]
         client: Option<String>,
     },
-
     /// Report basic document state
     Status {
         document: String,
     },
+    /// Sync operations from one client to another
+    Sync {
+        document: String,
+        #[arg(long)]
+        from: String,
+        #[arg(long)]
+        to: String,
+    },
+    /// Merge operations from multiple clients
+    Merge {
+        document: String,
+        #[arg(long)]
+        clients: String,
+    },
+    /// List operations
+    Log {
+        document: String,
+        #[arg(long)]
+        client: Option<String>,
+    },
+    /// Save snapshot
+    Save {
+        document: String,
+        #[arg(long)]
+        path: String,
+    },
+    /// Load from snapshot
+    Load {
+        #[arg(long)]
+        path: String,
+        #[arg(long, value_name = "DOC_ID")]
+        #[arg(long = "doc-id")]
+        doc_id: String,
+    },
+    /// Undo last operation for client
+    Undo {
+        document: String,
+        #[arg(long)]
+        client: String,
+    },
+    /// Redo last undone operation for client
+    Redo {
+        document: String,
+        #[arg(long)]
+        client: String,
+    },
+    /// Garbage collect tombstones
+    Gc {
+        document: String,
+    },
+    /// Compact (alias for gc)
+    Compact {
+        document: String,
+    },
+    /// Verify document integrity
+    Verify {
+        document: String,
+    },
 }
-
 
 fn run() -> Result<(), error::DocError> {
     let cli = Cli::parse();
@@ -177,7 +229,130 @@ fn run() -> Result<(), error::DocError> {
             println!("tombstones: {}", doc.tombstone_count());
             // Extra verification hint
             Ok(())
-        }    }
+        }
+        Commands::Sync {
+            document: doc_name,
+            from,
+            to,
+        } => {
+            persistence::validate_doc_name(&doc_name)?;
+            if from.is_empty() || to.is_empty() {
+                return Err(error::DocError::InvalidArgument(
+                    "from and to client IDs cannot be empty".to_string(),
+                ));
+            }
+            let mut doc = persistence::load_document(&doc_name)?;
+            doc.record_sync(&from, &to);
+            persistence::save_document(&doc)?;
+            Ok(())
+        }
+        Commands::Merge {
+            document: doc_name,
+            clients,
+        } => {
+            persistence::validate_doc_name(&doc_name)?;
+            let mut doc = persistence::load_document(&doc_name)?;
+            let client_list: Vec<String> = clients
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect();
+            if client_list.is_empty() {
+                return Err(error::DocError::InvalidArgument(
+                    "no clients specified".to_string(),
+                ));
+            }
+            doc.merge_clients(&client_list);
+            persistence::save_document(&doc)?;
+            Ok(())
+        }
+        Commands::Log {
+            document: doc_name,
+            client,
+        } => {
+            persistence::validate_doc_name(&doc_name)?;
+            let doc = persistence::load_document(&doc_name)?;
+            let ops = doc.list_operations(client.as_deref());
+            for op in ops {
+                // Include op_id, client, lamport, kind for debugging and test verification
+                println!(
+                    "{} {} {} {:?}",
+                    op.op_id, op.client_id, op.lamport, op.kind
+                );
+            }
+            Ok(())
+        }
+        Commands::Save {
+            document: doc_name,
+            path,
+        } => {
+            persistence::validate_doc_name(&doc_name)?;
+            if path.is_empty() {
+                return Err(error::DocError::InvalidArgument(
+                    "snapshot path cannot be empty".to_string(),
+                ));
+            }
+            let doc = persistence::load_document(&doc_name)?;
+            persistence::save_snapshot(&doc, &path)?;
+            Ok(())
+        }
+        Commands::Load { path, doc_id } => {
+            persistence::validate_doc_name(&doc_id)?;
+            if path.is_empty() {
+                return Err(error::DocError::InvalidArgument(
+                    "snapshot path cannot be empty".to_string(),
+                ));
+            }
+            // Existence and validity of existing target doc is okay to overwrite
+            let doc = persistence::load_snapshot(&path, &doc_id)?;
+            // Clear WAL for target doc before overwriting
+            let _ = persistence::clear_wal(&doc_id);
+            persistence::save_document(&doc)?;
+            Ok(())
+        }
+        Commands::Undo {
+            document: doc_name,
+            client,
+        } => {
+            persistence::validate_doc_name(&doc_name)?;
+            let mut doc = persistence::load_document(&doc_name)?;
+            // WAL marker first for crash safety tracking
+            let marker = operations::Operation::undo_marker(client.clone());
+            persistence::append_wal(&doc_name, &marker)?;
+            doc.undo(&client)?;
+            persistence::save_document(&doc)?;
+            Ok(())
+        }
+        Commands::Redo {
+            document: doc_name,
+            client,
+        } => {
+            persistence::validate_doc_name(&doc_name)?;
+            let mut doc = persistence::load_document(&doc_name)?;
+            let marker = operations::Operation::redo_marker(client.clone());
+            persistence::append_wal(&doc_name, &marker)?;
+            doc.redo(&client)?;
+            persistence::save_document(&doc)?;
+            Ok(())
+        }
+        Commands::Gc { document: doc_name } | Commands::Compact { document: doc_name } => {
+            persistence::validate_doc_name(&doc_name)?;
+            let mut doc = persistence::load_document(&doc_name)?;
+            doc.gc();
+            persistence::clear_wal(&doc_name)?;
+            persistence::save_document(&doc)?;
+            Ok(())
+        }
+        Commands::Verify { document: doc_name } => {
+            persistence::validate_doc_name(&doc_name)?;
+            let doc = persistence::load_document(&doc_name)?;
+            doc.verify()?;
+            println!("OK: document '{}' is healthy", doc_name);
+            println!("elements: {}", doc.status().0);
+            println!("tombstones: {}", doc.tombstone_count());
+            Ok(())
+        }
+    }
 }
 
 fn main() {

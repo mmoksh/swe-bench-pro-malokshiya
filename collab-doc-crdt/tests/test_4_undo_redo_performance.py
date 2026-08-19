@@ -256,7 +256,7 @@ def test_large_doc_performance_realistic_2000(workdir):
             args += ["--after", after]
         run_ok(args, cwd=workdir)
     elapsed=time.time()-start
-    assert elapsed < 90, f"2000 inserts took {elapsed}s"
+    assert elapsed < 30, f"2000 inserts took {elapsed}s"
     r=run_ok(["format", "doc"], cwd=workdir)
     assert f"line {n-1}" in r.stdout
     # gc preserves
