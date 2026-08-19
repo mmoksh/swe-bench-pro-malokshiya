@@ -1,8 +1,0 @@
-{
-  "id": "4",
-  "subject": "Write unit tests for ProxyPool",
-  "description": "Create test/utils.proxyPool.js covering: add/getProxy round-robin, failure threshold disabling, exponential backoff, auto-recovery after cooldown, reportSuccess resetting state, no-proxies error.",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

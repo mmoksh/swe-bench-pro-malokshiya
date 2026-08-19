@@ -1,9 +1,0 @@
-{
-  "id": "2",
-  "subject": "Integrate proxy support into request.js",
-  "description": "Modify request.js to accept a proxyPool option, select proxies, create HTTP agents, and report success/failure",
-  "activeForm": "Integrating proxy support",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

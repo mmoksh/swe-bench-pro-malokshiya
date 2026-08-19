@@ -1,9 +1,0 @@
-{
-  "id": "2",
-  "subject": "Export ReviewSync from index.js and add types to index.d.ts",
-  "description": "Wire up the new module in the package exports and add TypeScript declarations.",
-  "activeForm": "Updating exports and types",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

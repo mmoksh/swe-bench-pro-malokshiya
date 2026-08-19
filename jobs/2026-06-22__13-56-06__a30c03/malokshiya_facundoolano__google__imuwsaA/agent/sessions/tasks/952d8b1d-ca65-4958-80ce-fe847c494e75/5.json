@@ -1,9 +1,0 @@
-{
-  "id": "5",
-  "subject": "Update TypeScript declarations and export ProxyPool",
-  "description": "Update index.d.ts with ProxyPool types and export it from index.js",
-  "activeForm": "Updating TypeScript types",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

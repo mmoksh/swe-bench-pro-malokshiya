@@ -1,8 +1,0 @@
-{
-  "id": "3",
-  "subject": "Add TypeScript types for ProxyPool to index.d.ts",
-  "description": "Add ProxyConfig class declaration and ProxyPool class declaration to index.d.ts, and add ProxyPool to the defaultExport type.",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

@@ -1,9 +1,0 @@
-{
-  "id": "4",
-  "subject": "Write comprehensive tests",
-  "description": "Create test/utils.proxyPool.js with tests for: adding proxies, round-robin rotation, failure counting, proxy disabling, cooldown and recovery, exponential backoff, success resetting, error when empty, concurrent usage.",
-  "activeForm": "Writing tests for ProxyPool",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

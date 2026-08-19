@@ -1,9 +1,0 @@
-{
-  "id": "3",
-  "subject": "Thread proxyPool through all scraper modules",
-  "description": "Update all scraper modules (app, categories, datasafety, developer, list, permissions, reviews, search, similar, suggest) and processPages to pass opts.proxyPool through to request().",
-  "activeForm": "Threading proxyPool through scraper modules",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

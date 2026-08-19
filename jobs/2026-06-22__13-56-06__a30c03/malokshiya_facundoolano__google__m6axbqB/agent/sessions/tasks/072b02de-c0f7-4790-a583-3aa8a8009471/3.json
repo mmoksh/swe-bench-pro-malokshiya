@@ -1,9 +1,0 @@
-{
-  "id": "3",
-  "subject": "Export ProxyPool from package index",
-  "description": "Add ProxyPool export to index.js so users can import it.",
-  "activeForm": "Updating package exports",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

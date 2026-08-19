@@ -1,9 +1,0 @@
-{
-  "id": "3",
-  "subject": "Export ProxyPool and update types",
-  "description": "Export ProxyPool from index.js. Add ProxyConfig, ProxyPoolOptions, ProxyPool, and requestOptions types to index.d.ts.",
-  "activeForm": "Updating exports and type definitions",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

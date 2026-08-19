@@ -1,1 +1,0 @@
-Running selected tests: test/test_infra.js

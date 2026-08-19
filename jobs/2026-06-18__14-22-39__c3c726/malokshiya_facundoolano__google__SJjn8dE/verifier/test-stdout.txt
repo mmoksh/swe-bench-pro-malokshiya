@@ -1,9 +1,0 @@
-Running gold tests checkout: git clean -fd
-Removing solution_patch.diff
-Applying test_patch from config.json
-Required tests: 5
-Passed tests: 0
-Required tests that passed: 0
-
-RESULT: FAILED
-Missing tests: ['Suggest method (unrelated) should return search suggestions for a common term', 'Search fix should return apps with valid score and pricing fields', 'Search fix should return apps with valid appId and title fields', 'Search fix should work with country and language parameters', 'Search fix should return results when searching for a well-known app']

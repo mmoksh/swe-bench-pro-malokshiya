@@ -1,9 +1,0 @@
-{
-  "id": "3",
-  "subject": "Integrate ProxyPool with request layer",
-  "description": "Update lib/utils/request.js to accept and use a proxy pool for outgoing requests. Update index.d.ts with TypeScript declarations.",
-  "activeForm": "Integrating ProxyPool with request layer",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

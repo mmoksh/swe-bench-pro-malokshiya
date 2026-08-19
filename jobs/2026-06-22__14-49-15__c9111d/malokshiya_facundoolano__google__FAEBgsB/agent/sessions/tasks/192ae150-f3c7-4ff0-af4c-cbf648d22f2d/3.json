@@ -1,9 +1,0 @@
-{
-  "id": "3",
-  "subject": "Add TypeScript declarations for ProxyPool",
-  "description": "Add ProxyConfig and ProxyPool interfaces to index.d.ts",
-  "activeForm": "Adding TypeScript declarations",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

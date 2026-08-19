@@ -1,9 +1,0 @@
-{
-  "id": "1",
-  "subject": "Create ProxyPool class in lib/utils/proxyPool.js",
-  "description": "Implement the ProxyPool class with: add(), getProxy(), reportSuccess(), reportFailure(). Support round-robin rotation, failure tracking with configurable threshold, exponential backoff cooldown, and automatic recovery of disabled proxies.",
-  "activeForm": "Implementing ProxyPool class",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

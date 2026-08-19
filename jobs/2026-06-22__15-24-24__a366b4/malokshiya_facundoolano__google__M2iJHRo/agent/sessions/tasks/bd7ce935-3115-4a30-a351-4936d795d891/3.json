@@ -1,8 +1,0 @@
-{
-  "id": "3",
-  "subject": "Write tests for ProxyPool",
-  "description": "Create /app/test/utils.proxyPool.js with unit tests for all behaviors",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

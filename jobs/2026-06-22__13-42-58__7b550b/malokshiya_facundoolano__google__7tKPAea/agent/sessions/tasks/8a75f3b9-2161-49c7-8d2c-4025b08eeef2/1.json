@@ -1,9 +1,0 @@
-{
-  "id": "1",
-  "subject": "Create ReviewSync class in lib/reviewSync.js",
-  "description": "Implement the core sync logic: paginate by NEWEST, track checkpoint (timestamp + boundary IDs), deduplicate, stop early on incremental runs when a full page of old reviews is hit.",
-  "activeForm": "Implementing ReviewSync class",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

@@ -1,6 +1,0 @@
-Skipping image OS validation for hb__codimango-malokshiya_facundoolano__google-play-scraper-df5df78-v1: docker inspect returned 1
-Skipping image OS validation for hb__codimango-malokshiya_facundoolano__google-play-scraper-df5df78-v1: docker inspect returned 1
-Skipping image OS validation for hb__codimango-malokshiya_facundoolano__google-play-scraper-df5df78-v1: docker inspect returned 1
-Skipping baseline verification: tests/config.json defines a test_patch (SWE-bench-pro task; use the test_patch_validation agent for proper validation)
-Skipping baseline verification: tests/config.json defines a test_patch (SWE-bench-pro task; use the test_patch_validation agent for proper validation)
-Skipping baseline verification: tests/config.json defines a test_patch (SWE-bench-pro task; use the test_patch_validation agent for proper validation)
