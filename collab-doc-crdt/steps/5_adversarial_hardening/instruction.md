@@ -1,210 +1,371 @@
-# Milestone 5 — Adversarial Hardening and Production Readiness
+# Milestone 5 — Adversarial Validation and Production Hardening
 
-You now have a feature-complete collaborative document system with multi-client sync, offline recovery, undo/redo, and performance handling.
+Harden the existing Rust `collab-doc` application so that it remains correct, durable, deterministic, and performant under adversarial workloads.
 
-In this final milestone, harden the system against **adversarial conditions**, **malicious or buggy clients**, **data corruption**, and **high-concurrency stress**.
+The application already supports document editing, persistence, multi-client synchronization, offline operation, crash recovery, undo, redo, and large-document workloads. Treat the current implementation as potentially containing subtle bugs.
 
-## 1. Corruption Detection and Handling
+Your task is to systematically find and fix those bugs.
 
-### Document integrity verification
+The repository is the primary deliverable. Do not merely report failures. Reproduce them, determine their root causes, implement fixes, add regression tests, and rerun the relevant validation.
 
-Implement:
+## 1. Establish a Clean Baseline
 
-```text
-collab-doc verify <document>
-```
+Start by creating a clean build and running the complete existing test suite.
 
-Or extend `status` to include corruption check.
-
-`verify` should:
-
-* Check that the document JSON file is valid JSON and matches expected schema
-* Check that all element IDs in `order` exist in `elements` map (or are tombstones accounted for)
-* Check that no duplicate element IDs exist in order
-* Check that operation log is consistent with document state (replay operations and compare — optional but recommended)
-* Check that vector clocks are monotonically increasing and consistent with operation counts
-* Check that undo/redo stacks reference only existing operation IDs
-
-Exit code 0 if document is healthy, non-zero if corruption detected, with error message to stderr describing issue.
-
-Example:
-
-```text
-collab-doc verify notes   # should print "OK" or similar and exit 0 on healthy doc
-```
-
-If corruption is detected, the command must not delete or further corrupt data. It may attempt recovery from WAL if possible, but must not make things worse.
-
-### WAL integrity
-
-* WAL entries should be validated on replay: each entry must be valid JSON with required fields
-* Corrupted WAL lines (invalid JSON) should be skipped with warning, not cause panic or full doc loss
-* Partial WAL writes (truncated last line) should be detected and ignored
-
-### Save file integrity
-
-* `load` must validate snapshot file is valid before overwriting existing document (read and validate first, then write)
-* If snapshot is corrupted (invalid JSON), load must return non-zero and not overwrite existing doc
-
-## 2. Byzantine / Malicious Client Handling
-
-Simulate adversarial clients that may send invalid operations. The system must remain correct for honest clients.
-
-The CLI does not have network, so Byzantine handling is about robustness to malformed input and operation validation.
-
-Your implementation must defensively handle:
-
-* **Duplicate element IDs**: already covered, but emphasize deterministic resolution even when malicious client repeatedly tries same ID with different values — document must stay consistent across merges.
-* **Invalid after references**: client inserts after non-existent ID — must return non-zero, not corrupt.
-* **Deleting already-deleted element**: return non-zero or treat as no-op, but not corrupt.
-* **Malformed document file**: if `.collab-doc/<doc>.json` is manually edited to contain invalid data (e.g., duplicate IDs in order, element without ID, order referencing missing ID), `status` / `format` / `verify` should detect and report rather than panic.
-* **Operation ID collisions**: operation IDs should be UUIDs; if two ops have same op_id (simulated by directly editing files), second should be treated as duplicate and ignored (idempotent).
-* **Clock skew / rollback**: client claims Lamport clock far in future or goes backwards. Your system should accept it but ensure monotonicity per client is eventually enforced? At minimum, should not crash on large Lamport values (u64). If client sends lamport smaller than its last seen, you may either reject or accept and update clock to max — document choice. Key is no panic, no corruption.
-* **Very large values**: element value of 1MB or 10MB — should not OOM, should handle gracefully or return error for excessive size with non-zero. At minimum, 100KB values should work.
-* **Many clients**: 100+ distinct client IDs should not cause performance collapse.
-
-## 3. Concurrent Edit Storm
-
-The system must handle high-concurrency scenarios:
-
-* 10 clients each inserting 100 elements concurrently at random positions (simulated by interleaving CLI invocations or via Rust multithreaded tests)
-* After all inserts + merges, document converges deterministically
-* No data loss of honest clients' operations (except legitimate conflict resolution where duplicate ID forces one winner, but that winner rule must be deterministic)
-* Format after storm completes in <2s for 1000 elements
-* Status after storm shows correct element counts
-
-Stress test via Rust unit tests (not just CLI, to avoid process spawn overhead):
-
-```rust
-#[test]
-fn test_concurrent_insert_storm() {
-    // 5 clients, 200 ops each, random positions, final merge deterministic
-}
-```
-
-Similar for delete storm:
-
-* Start with 1000 elements, 5 clients randomly deleting 50% each concurrently, merge, verify final state consistent, no panics.
-
-## 4. Determinism Under Adversity
-
-Even under adversarial interleaving, the system must remain deterministic:
-
-* Given same set of operations (same IDs, values, after pointers, client_ids, lamports), final formatted output must be identical regardless of the order operations were applied (as long as causal order is eventually respected via merge)
-* Test: take a fixed set of 50 operations from 3 clients, apply in 10 random orders, after each full application + merge, format output must be identical across all 10 runs. Each run starts from clean state.
-
-## 5. Resource Limits and DoS Prevention
-
-Implement basic DoS protection:
-
-* Limit document name length / validation: reject names with path traversal (`../`), with `/`, with null bytes, empty names — return non-zero, don't create file outside .collab-doc dir
-* Element ID validation: reject IDs with newlines? Or handle them safely (if you allow any string, ensure formatting/quoting handles it). Safer to restrict to alphanumeric + _- but document whatever you allow. At minimum, prevent empty ID.
-* Value size: if value exceeds some threshold (e.g., 1MB), you may reject with clear error, or handle; but must not panic or OOM on 10MB value attempted
-* Operation log growth: GC should prevent unbounded growth; status should still be fast even with 10k operations in log
-* File descriptor handling: ensure files are closed even on error paths
-
-## 6. Extended CLI Robustness
-
-All commands must:
-
-* Return non-zero on invalid arguments (missing required args, unknown flags) — clap does this by default
-* Not panic on unexpected input — use Result and exit 1 with stderr message
-* Validate document IDs: prevent directory traversal (`../etc/passwd` should not create file outside .collab-doc). Sanitization: reject any doc name containing `/` or `..` or `.` as path components, or ensure you join safely and canonicalize check.
-* Handle special characters in values: values may contain newlines, quotes, unicode, etc. Ensure CLI quoting works and persistence preserves them exactly (round-trip). Tests will include values with `\n`, `"`, `'`, emoji, etc.
-
-### `verify` command (required for this milestone)
-
-```text
-collab-doc verify <document>
-```
-
-As described in section 1. Prints health status and exits 0 if healthy, non-zero if corruption detected.
-
-If you choose not to add new `verify` binary subcommand and instead want to extend `status` to do verification, you must still support `verify` as alias or documented command — tests will try `verify` first, fallback to `status --verify` or similar, but having explicit `verify` is required.
-
-## 7. Security Considerations
-
-Although this is a local CLI, document in code comments or README:
-
-* How you prevent path traversal in doc names
-* How you handle large inputs
-* How operation IDs are generated securely (UUID v4)
-* That document files are stored with restrictive permissions? Not required but good practice.
-
-## 8. Testing Requirements for Hardening
-
-This milestone's tests are the most demanding — they are **adversarial**.
-
-Include:
-
-* **Corruption detection**: manually corrupt doc file (duplicate ID in order, order references missing ID, invalid JSON), run verify/status, ensure it returns non-zero or detects corruption without panic
-* **WAL corruption**: write invalid JSON line to WAL, run status/format, ensure it doesn't panic, recovers or ignores bad line
-* **Path traversal**: `collab-doc new ../../tmp/evil` should fail with non-zero and not create file outside .collab-doc
-* **Large value**: insert element with 100KB value, verify get returns same value, format includes it (or at least doesn't panic)
-* **Many clients**: create document, insert from 50 distinct clients, status reports clients correctly, merge all 50
-* **Concurrent storm**: 5 clients × 100 inserts concurrent (interleaved), final state deterministic across multiple runs with same operations but different application order — test convergence
-* **Determinism**: fixed set of 50 ops applied in 10 random orders, final format identical
-* **Idempotency under storm**: applying same operation twice during storm doesn't duplicate or corrupt
-* **Undo/redo under concurrency**: while concurrent inserts happening, undo/redo still works for respective client
-* **Save/load of corrupted doc**: save after corruption should either fail or save what it can, load of corrupted snapshot should fail without overwriting healthy doc
-* **GC safety under concurrency**: run GC while concurrent ops happening (simulated via Rust threads) — should not corrupt, format before/after GC for live elements same
-
-Also run existing tests from milestones 1-4 — they must still pass. Hardening should not break functionality.
-
-Performance under adversity:
-
-* After adversarial tests, document with 5000 elements + 2000 tombstones should still format in <2s
-* Verify of large document (5000 elements) should be <2s
-
-## 9. Final Production Readiness
-
-Before finishing:
-
-* Run:
+Run:
 
 ```text
 cargo build --release
 cargo test
 ```
 
-Both must pass.
+Exercise the CLI through fresh subprocesses rather than relying only on in-process tests.
 
-* Run CLI manually through all commands:
+Record the initial test results and identify any existing failures before making changes.
+
+Do not assume that passing existing tests means the implementation is correct.
+
+## 2. Adversarial Multi-Client Workloads
+
+Construct workloads involving multiple independent clients.
+
+Clients should independently perform combinations of:
+
+* insertions;
+* deletions;
+* modifications;
+* undo;
+* redo;
+* synchronization;
+* offline editing;
+* reconnection;
+* process restart.
+
+Do not synchronize clients after every operation.
+
+Allow clients to develop substantially different operation histories before exchanging state.
+
+For example:
 
 ```text
-collab-doc new testdoc
-collab-doc insert testdoc --id a --value "Hello" --client alice
-collab-doc insert testdoc --id b --value "world" --client bob --after a
-collab-doc sync testdoc --from alice --to bob
-collab-doc merge testdoc --clients alice,bob
-collab-doc format testdoc
-collab-doc status testdoc
-collab-doc save testdoc --path /tmp/snap.json
-collab-doc load --path /tmp/snap.json --doc-id testdoc2
-collab-doc format testdoc2
-collab-doc undo testdoc --client alice
-collab-doc redo testdoc --client alice
-collab-doc verify testdoc
-collab-doc gc testdoc
+Client A: 100 local operations
+Client B: 150 local operations
+Client C: 75 local operations
+
+Then exchange operations in arbitrary orders.
 ```
 
-All should succeed (exit 0) except undo/redo edge cases where no ops left — those return non-zero correctly.
+After communication has completed, verify that all clients converge to the same logical document state.
 
-* Check that binary is at `target/release/collab-doc` or `target/debug/collab-doc` and can be invoked via `cargo run -- <args>`.
+Repeat the workload with different operation and delivery orders.
 
-* If you use `assert_cmd` or similar dev dependencies, ensure they don't break release build.
+## 3. Adversarial Message Delivery
 
-## 10. Completion Criteria
+Test synchronization under hostile delivery conditions.
 
-* verify command implemented and detects corruption
-* Path traversal prevented
-* Corruption handling: invalid JSON/docs don't panic, return non-zero with clear message
-* WAL corruption handling: invalid lines skipped, not fatal
-* Large values handled (100KB works)
-* Many clients (50+) handled
-* Concurrent edit storm (5×100) converges deterministically
-* Determinism test: same ops, different apply order, same final format
-* Resource limits: doc name validation, not OOM on large value
-* All previous milestone tests still pass
-* Performance still acceptable after hardening
-* cargo build, cargo test pass, no panics on adversarial inputs
+Generate message schedules containing arbitrary combinations of:
+
+* reordering;
+* duplication;
+* delay;
+* repeated delivery;
+* partial delivery;
+* long gaps between messages.
+
+A message may arrive many times and in an order completely unrelated to the order in which it was generated.
+
+For a fixed logical workload, generate many different delivery schedules.
+
+The final document must be independent of the delivery schedule.
+
+If a failure occurs, preserve the exact operation set and delivery schedule that produced it.
+
+Reduce the failure to the smallest reproducible case and add it to the regression suite.
+
+## 4. Randomized State-Machine Testing
+
+Build a randomized state-machine test that models clients and their interactions.
+
+Generate operations such as:
+
+```text
+insert
+delete
+modify
+undo
+redo
+sync
+disconnect
+reconnect
+restart
+```
+
+Allow random actions to occur on different clients.
+
+Maintain an independent reference model where practical and compare the implementation against it.
+
+Run sufficiently long sequences to expose interactions that are unlikely to appear in ordinary unit tests.
+
+Do not stop after finding one failure. Fix failures and continue testing until repeated randomized runs remain stable.
+
+Use deterministic random seeds so that failures can be reproduced.
+
+## 5. Crash and Recovery Stress Testing
+
+Combine crash injection with synchronization and editing.
+
+Terminate clients at arbitrary points during:
+
+* local operations;
+* persistence;
+* synchronization;
+* acknowledgement;
+* recovery;
+* undo;
+* redo.
+
+After each crash:
+
+1. restart the process;
+2. recover persistent state;
+3. continue operating;
+4. synchronize with other clients;
+5. verify document consistency.
+
+Also test repeated crashes:
+
+```text
+edit
+→ crash
+→ recover
+→ sync
+→ edit
+→ crash
+→ recover
+→ sync
+→ edit
+→ crash
+→ recover
+```
+
+The application must remain recoverable and must not silently lose durable state.
+
+## 6. Persistence Corruption Testing
+
+Test the behavior of the application when persistent files contain unexpected data.
+
+Construct cases involving:
+
+* truncated files;
+* incomplete records;
+* invalid identifiers;
+* invalid operation types;
+* malformed serialized values;
+* duplicated records;
+* unexpected fields;
+* partially written state.
+
+The application must fail safely.
+
+It must not silently convert corrupted persistent state into an incorrect valid-looking document.
+
+Where recovery is possible, verify that recovery produces the correct state.
+
+Where recovery is impossible, return a clear error without destroying unrelated persistent data.
+
+## 7. Idempotence and Repetition
+
+Repeated actions must not unexpectedly change logical state.
+
+Test repeated:
+
+```text
+sync
+sync
+sync
+```
+
+as well as repeated delivery of the same operations.
+
+Also test repeated:
+
+```text
+recover
+recover
+recover
+```
+
+and repeated process restarts.
+
+After the system reaches a stable state, performing additional synchronization or recovery operations should not change the document.
+
+## 8. Undo/Redo Stress Testing
+
+Exercise undo and redo under complicated histories.
+
+Generate sequences containing:
+
+* many consecutive edits;
+* many consecutive undos;
+* many consecutive redos;
+* edits after undo;
+* synchronization between undo and redo;
+* concurrent edits from other clients;
+* offline edits;
+* restarts;
+* crashes.
+
+Verify that undo only affects the appropriate logical operation and does not accidentally remove unrelated changes.
+
+Verify that all clients eventually converge after synchronization.
+
+Pay particular attention to long histories where a naive implementation may consume excessive memory or become unexpectedly slow.
+
+## 9. Large-Scale Testing
+
+Generate substantially larger workloads than the normal unit tests.
+
+Test documents with at least:
+
+* 100,000 elements;
+* hundreds of thousands of operations;
+* long synchronization histories;
+* multiple independent clients.
+
+Measure:
+
+* execution time;
+* peak memory;
+* persistent storage size;
+* synchronization volume;
+* startup/recovery time.
+
+Look for performance degradation that becomes apparent only at scale.
+
+Use profiling to identify the actual source of significant bottlenecks.
+
+Fix problems that violate the application's practical resource requirements.
+
+## 10. CLI Black-Box Validation
+
+Treat the CLI as the public interface.
+
+Exercise every command through independent subprocesses.
+
+Verify:
+
+* correct exit codes;
+* stdout contents;
+* stderr contents;
+* persistence between invocations;
+* behavior after process termination;
+* behavior after recovery;
+* behavior for invalid arguments;
+* behavior for missing documents;
+* behavior for missing clients;
+* behavior for malformed input.
+
+Test combinations rather than isolated commands.
+
+For example:
+
+```text
+new
+→ create client
+→ insert
+→ insert
+→ sync
+→ offline
+→ edit
+→ restart
+→ online
+→ sync
+→ undo
+→ redo
+→ format
+→ status
+```
+
+The exact CLI contract must remain unchanged.
+
+## 11. Regression Discipline
+
+Every bug discovered during this milestone must result in a regression test whenever practical.
+
+For each failure:
+
+1. reproduce it;
+2. isolate the cause;
+3. minimize the failing workload;
+4. identify the violated invariant;
+5. fix the underlying implementation;
+6. add a regression test;
+7. rerun the regression;
+8. rerun the broader test suite.
+
+Do not fix failures by:
+
+* disabling tests;
+* reducing test coverage;
+* ignoring an operation;
+* silently dropping messages;
+* hard-coding expected results;
+* adding arbitrary timing delays;
+* special-casing individual test inputs.
+
+## 12. Final Validation
+
+After making all necessary fixes, perform a clean validation from the final repository state.
+
+Run:
+
+```text
+cargo build --release
+cargo test
+```
+
+Run the complete black-box CLI suite.
+
+Run randomized tests using multiple deterministic seeds.
+
+Run crash-injection tests.
+
+Run persistence corruption tests.
+
+Run large-document benchmarks.
+
+Repeat important tests after a fresh build to ensure the result does not depend on stale artifacts or process-local state.
+
+## Acceptance Criteria
+
+The milestone is complete only when:
+
+1. The project builds successfully from a clean state.
+2. The complete Rust test suite passes.
+3. All black-box CLI tests pass.
+4. Multi-client randomized workloads converge.
+5. Arbitrary message ordering does not change the final logical state.
+6. Duplicate message delivery does not corrupt state.
+7. Offline edits survive process restarts.
+8. Crash recovery preserves durable state.
+9. Repeated recovery is safe.
+10. Malformed persistent state is handled safely.
+11. Undo/redo remains correct under concurrent and offline workloads.
+12. Large documents and long operation histories can be processed successfully.
+13. Significant performance problems have been investigated and addressed.
+14. Every important bug discovered during validation has corresponding regression coverage.
+15. No tests have been disabled, weakened, or bypassed.
+16. No required functionality remains stubbed or silently ignored.
+
+Do not declare completion while known correctness failures remain.
+
+The final repository, executable behavior, automated tests, and measured performance are the primary deliverables.
+
+Provide a concise final report containing:
+
+* the major issues discovered;
+* the fixes implemented;
+* the regression tests added;
+* final test results;
+* final performance measurements;
+* any remaining limitations.

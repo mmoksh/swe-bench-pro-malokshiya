@@ -79,26 +79,44 @@ def test_load_nonexistent_fails(workdir):
 def test_wal_exists_after_ops(workdir):
     run_ok(["new", "doc"], cwd=workdir)
     run_ok(["insert", "doc", "--id", "a", "--value", "A"], cwd=workdir)
-    wal = pathlib.Path(workdir) / ".collab-doc" / "doc.wal"
-    # WAL may or may not exist depending on impl - if it exists check content, if not that's okay but save should still work
-    # We check that at least doc.json exists
-    doc_json = pathlib.Path(workdir) / ".collab-doc" / "doc.json"
-    assert doc_json.exists()
+    # black-box persistence: verify via CLI that state is durable (works with any storage backend - JSON, SQLite, etc.)
+    r = run_ok(["format", "doc"], cwd=workdir)
+    assert "A" in r.stdout
+    snap = os.path.join(workdir, "wal_persist.json")
+    run_ok(["save", "doc", "--path", snap], cwd=workdir)
+    assert os.path.exists(snap)
+    run_ok(["load", "--path", snap, "--doc-id", "doc_wal_reload"], cwd=workdir)
+    r2 = run_ok(["format", "doc_wal_reload"], cwd=workdir)
+    assert r2.stdout == r.stdout
+    r3 = run_ok(["status", "doc"], cwd=workdir)
+    assert "elements: 1" in r3.stdout.lower()
 
 def test_wal_recovery_on_truncation(workdir):
     run_ok(["new", "doc"], cwd=workdir)
     run_ok(["insert", "doc", "--id", "a", "--value", "A"], cwd=workdir)
     run_ok(["insert", "doc", "--id", "b", "--value", "B", "--after", "a"], cwd=workdir)
-    # truncate main file to simulate crash - implementation should recover from WAL or at least not panic
+    r_before = run_ok(["format", "doc"], cwd=workdir)
+    assert "A" in r_before.stdout and "B" in r_before.stdout
+    r_status_before = run_ok(["status", "doc"], cwd=workdir)
+    assert "elements: 2" in r_status_before.stdout.lower()
     doc_json = pathlib.Path(workdir) / ".collab-doc" / "doc.json"
     if doc_json.exists():
-        # truncate
         with open(doc_json, "w") as f:
             f.write("{ invalid")
-        # now status should either recover or return error but not panic
-        r = run(["status", "doc"], cwd=workdir)
-        # should be either 0 with recovery or non-zero with clear error, but not segfault
-        assert r.returncode in [0,1]
+        # WAL must recover the document - status must succeed and report correct state
+        r = run_ok(["status", "doc"], cwd=workdir)
+        assert r.returncode == 0
+        assert "elements: 2" in r.stdout.lower()
+        # format must be restored exactly
+        r_fmt = run_ok(["format", "doc"], cwd=workdir)
+        assert r_fmt.stdout == r_before.stdout
+        # status again to verify idempotent recovery
+        r2 = run_ok(["status", "doc"], cwd=workdir)
+        assert r2.stdout == r.stdout
+        # document file must be repaired (valid JSON)
+        with open(doc_json) as f:
+            data = json.load(f)
+            assert data["order"] == ["a", "b"]
 
 def test_large_save_load(workdir):
     run_ok(["new", "doc"], cwd=workdir)
@@ -137,3 +155,77 @@ def test_atomic_write_no_corruption_parallel(workdir):
             assert data is not None
     r = run_ok(["format", "doc"], cwd=workdir)
     assert r.returncode == 0
+
+# --- Realistic offline / save-load with rich text ---
+REALISTIC_SNAP_TEXTS = [
+    "# Offline Notes **v1** *draft*",
+    "## Section **Data** *sync*",
+    "Paragraph **bold** *italic* normal text lorem ipsum",
+    "```json\n{\"key\": \"value\"} \n```",
+    "> **Important** *offline* queue",
+]
+
+def test_save_load_rich_text_roundtrip(workdir):
+    import os
+    run_ok(["new", "doc"], cwd=workdir)
+    for i, val in enumerate(REALISTIC_SNAP_TEXTS):
+        args = ["insert", "doc", "--id", f"r{i}", "--value", val, "--client", "alice"]
+        if i>0:
+            args += ["--after", f"r{i-1}"]
+        run_ok(args, cwd=workdir)
+    # add 60 more realistic ops
+    for i in range(5, 65):
+        val = f"Line {i}: **bold {i}** *italic {i}* content"
+        args = ["insert", "doc", "--id", f"r{i}", "--value", val, "--client", f"client{i%3}", "--after", f"r{i-1}"]
+        run_ok(args, cwd=workdir)
+    snap = os.path.join(workdir, "snap.json")
+    r1 = run_ok(["format", "doc"], cwd=workdir)
+    run_ok(["save", "doc", "--path", snap], cwd=workdir)
+    run_ok(["load", "--path", snap, "--doc-id", "doc2"], cwd=workdir)
+    r2 = run_ok(["format", "doc2"], cwd=workdir)
+    assert r1.stdout == r2.stdout
+    assert "# Offline Notes" in r2.stdout
+
+def test_large_save_load_1000_with_rich_text(workdir):
+    import os
+    run_ok(["new", "doc"], cwd=workdir)
+    n=800
+    for i in range(n):
+        after = f"e{i-1}" if i>0 else None
+        if i%50==0:
+            val = f"# Heading {i} **bold** *italic*"
+        else:
+            val = f"value {i} **b{i}** *i{i}*"
+        args = ["insert", "doc", "--id", f"e{i}", "--value", val]
+        if after:
+            args += ["--after", after]
+        run_ok(args, cwd=workdir)
+    snap = os.path.join(workdir, "snap.json")
+    run_ok(["save", "doc", "--path", snap], cwd=workdir)
+    run_ok(["load", "--path", snap, "--doc-id", "doc2"], cwd=workdir)
+    r = run_ok(["status", "doc2"], cwd=workdir)
+    assert f"elements: {n}" in r.stdout
+
+def test_interleaved_offline_recovery_realistic(workdir):
+    import os, pathlib, json as _json
+    run_ok(["new", "doc"], cwd=workdir)
+    # simulate offline batch: create 50 ops then save/load as recovery
+    for i in range(50):
+        val = f"Offline line {i} **bold** *italic* heading" if i%10==0 else f"offline value {i}"
+        after = f"o{i-1}" if i>0 else None
+        args = ["insert", "doc", "--id", f"o{i}", "--value", val, "--client", "alice"]
+        if after:
+            args += ["--after", after]
+        run_ok(args, cwd=workdir)
+    r_before = run_ok(["format", "doc"], cwd=workdir)
+    snap = os.path.join(workdir, "recovery.json")
+    run_ok(["save", "doc", "--path", snap], cwd=workdir)
+    # corrupt doc.json to simulate crash
+    doc_json = pathlib.Path(workdir) / ".collab-doc" / "doc.json"
+    if doc_json.exists():
+        with open(doc_json, "w") as f:
+            f.write("{ invalid")
+    # load from snapshot into new doc should still recover content
+    run_ok(["load", "--path", snap, "--doc-id", "recovered"], cwd=workdir)
+    r_after = run_ok(["format", "recovered"], cwd=workdir)
+    assert r_before.stdout == r_after.stdout

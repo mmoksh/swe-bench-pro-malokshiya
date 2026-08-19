@@ -1,165 +1,324 @@
-# Milestone 3 — Offline Operation and Crash Recovery
+# Milestone 3 — Offline Editing and Crash Recovery
 
-You now have a multi-client document system with causal ordering and sync/merge from milestone 2.
+Extend the existing Rust `collab-doc` application so that clients can continue editing while disconnected and reliably recover from process crashes.
 
-In this milestone, make the system **resilient to crashes and network partitions** by implementing Write-Ahead Logging (WAL), snapshotting, offline operation queuing, and reconciliation.
+The existing document and synchronization functionality must continue to work.
 
-## 1. WAL Persistence
+The primary deliverable is the working repository. Implement the functionality, create tests, run experiments, investigate failures, and iterate until the acceptance criteria are satisfied.
 
-Implement a Write-Ahead Log for each document:
+## 1. Offline Editing
 
-* Before applying any operation to the main document file, append the operation to a WAL file.
-* WAL file location: `.collab-doc/<doc>.wal` or similar alongside the main document file. Choose a deterministic path your implementation documents.
-* Each WAL entry must contain full operation data: op_id, client_id, lamport, kind, timestamp.
-* On startup (any CLI command), check if WAL exists and has entries not yet reflected in main file — replay WAL to recover.
-* WAL must be fsynced or at least flushed to survive process crashes (use file sync where appropriate, or at least ensure buffered writes are flushed).
+A client must be able to make document changes without communicating with another client.
 
-### Crash Recovery Semantics
+When a client is offline:
 
-After a crash (simulated by killing process mid-write or by existing WAL containing ops not yet checkpointed):
+* local edits must continue to work;
+* edits must be persisted locally;
+* generated operations must not be lost;
+* the client must retain enough information to synchronize its changes later.
 
-* `collab-doc status <doc>` must recover and show correct counts
-* `collab-doc format <doc>` must show recovered state
-* No operations already acknowledged to client may be lost
+An offline client may perform an arbitrary sequence of insertions, deletions, and modifications.
 
-## 2. Extended CLI: save / load Snapshot
+After reconnecting, its operations must be incorporated into the shared document correctly.
 
-### `save`
+For example:
 
 ```text
-collab-doc save <document> --path <file-path>
+alice goes offline
+alice performs 100 edits
+alice process exits
+alice process restarts
+alice reconnects
 ```
 
-Save a snapshot of the current document state to an arbitrary file path. The snapshot format is implementation-defined (JSON 권장) but must contain:
+All durable edits must still be available for synchronization.
 
-* all live elements with IDs and values and ordering
-* all operations (or at least sufficient to reconstruct)
-* vector clocks / lamport clocks per client
-* client list
+## 2. Durable Synchronization State
 
-The snapshot file should be self-contained and portable.
+Persist the information necessary for a client to determine:
 
-Example:
+* which operations it has generated;
+* which operations it has received;
+* which operations have been incorporated into its local state;
+* which operations still need to be synchronized.
+
+This state must survive process termination.
+
+Restarting a client must not cause it to forget previously received operations or unnecessarily regenerate operations that it has already persisted.
+
+Repeated synchronization after a restart must remain safe and idempotent.
+
+## 3. Client Restart
+
+A client may terminate at any point during normal operation.
+
+After restarting, it must recover its local document and synchronization state from persistent storage.
+
+Test scenarios including:
 
 ```text
-collab-doc save notes --path /tmp/notes.snapshot.json
+create client
+→ make edits
+→ terminate process
+→ restart
+→ inspect document
 ```
 
-Return non-zero if document not found or path not writable.
-
-### `load`
+and:
 
 ```text
-collab-doc load --path <file-path> --doc-id <document-id>
+create client
+→ make edits
+→ terminate process
+→ restart
+→ synchronize
+→ verify convergence
 ```
 
-Load a document from a snapshot file created by `save`. Creates or overwrites the document with ID `<document-id>` from the snapshot.
+The recovered state must be equivalent to the state that existed before termination, subject to operations that had not yet been durably persisted.
 
-If document ID already exists, overwrite it (or return error but implementation must be consistent — document in tests which you choose; overwriting is simpler).
+Define the persistence boundary clearly in the implementation.
 
-Example:
+## 4. Server Persistence
+
+The synchronization system must maintain persistent shared state.
+
+Restarting the server or synchronization store must not lose operations that had already been durably recorded.
+
+After restart, clients must be able to reconnect and continue synchronization.
+
+Test:
 
 ```text
-collab-doc load --path /tmp/notes.snapshot.json --doc-id notes2
-collab-doc format notes2  # should equal original notes format
+client A creates operations
+→ synchronization store persists them
+→ synchronization service terminates
+→ synchronization service restarts
+→ client B reconnects
+→ client B receives the operations
 ```
 
-Save/load must preserve:
-* element ordering
-* element values
-* client clocks
-* operation history (if applicable)
+The final document must be correct.
 
-Round-trip requirement:
+## 5. Crash Injection
+
+Add a mechanism for deliberately terminating a process at important points during an operation.
+
+At minimum, test crashes around:
+
+* before an operation is persisted;
+* after an operation is persisted;
+* before synchronization state is updated;
+* after synchronization state is updated;
+* before an acknowledgement is recorded;
+* after an acknowledgement is recorded.
+
+You may implement crash injection through an environment variable, test-only configuration, or another mechanism appropriate for the repository.
+
+The crash mechanism must allow automated tests to reproduce failures deterministically.
+
+Do not treat a process crash as an exceptional condition that can simply be ignored.
+
+## 6. Persistence Ordering
+
+Carefully reason about the ordering between:
+
+1. applying an operation;
+2. persisting the operation;
+3. updating synchronization metadata;
+4. acknowledging the operation.
+
+A crash between any two of these stages must not leave the persistent state in a form that silently loses or corrupts an operation.
+
+In particular, distinguish between:
+
+* an operation that was never persisted;
+* an operation that was persisted but not acknowledged;
+* an operation that was acknowledged;
+* an operation that was received but not yet applied.
+
+Use tests and fault injection to validate the behavior rather than relying solely on reasoning.
+
+## 7. Recovery
+
+When a process restarts after a crash, it must inspect its persistent state and recover to a valid state.
+
+Recovery must be:
+
+* deterministic;
+* repeatable;
+* safe to execute more than once.
+
+If the application finds partially written or otherwise invalid persistent state, it must handle it safely.
+
+It must not silently construct a corrupted document from incomplete data.
+
+Where recovery can determine that an operation needs to be replayed, replaying it must not corrupt the document.
+
+## 8. Synchronization After Failure
+
+Clients must be able to synchronize correctly after crashes.
+
+Test combinations such as:
 
 ```text
-save doc --path X
-load --path X --doc-id doc2
-format doc == format doc2
-status doc elements == status doc2 elements
+A edits
+→ A crashes
+→ A restarts
+→ B edits concurrently
+→ A synchronizes with B
 ```
 
-## 3. Offline Operation Queue
+and:
 
-Simulate offline operation: clients may perform operations while "offline", queuing them locally, then syncing later.
-
-Implementation approach (choose one and document):
-
-* Option A: per-client offline queue file `.collab-doc/<doc>.<client>.offline` that stores operations not yet merged into main doc. When client goes "offline" (config file or flag), operations go to queue. On `sync`, queue is flushed.
-* Option B: main WAL already serves as offline queue — all ops go to WAL and are considered pending until merge.
-
-Simplest that satisfies tests: even if you treat offline as same as online (operations immediately visible), you must support a mechanism where operations can be replayed after a crash and `save`/`load` captures the complete state.
-
-However, to demonstrate understanding, implement at minimum:
-
-* If `.collab-doc/<doc>.wal` exists with pending ops, any command loads and applies them before proceeding.
-* Ability to tolerate missing or partial writes: if main JSON file is corrupted or truncated (simulated by tests truncating file), recover from WAL if possible, or at least return non-zero with clear error rather than panic and not delete unrelated documents.
-
-### Reconciliation
-
-After offline period:
-
-* Client B's queued ops should be mergeable into main document via `sync` or `merge`
-* After reconciliation, all clients converge to same state
-* Causality must still be respected — queued ops must have proper Lamport clocks assigned at queue time, not at sync time
-
-## 4. Atomic Writes and Fsafety
-
-Main document file should be written atomically:
-
-* Write to temp file `.collab-doc/<doc>.json.tmp` then rename to `.collab-doc/<doc>.json` (atomic on POSIX)
-* This prevents corruption if crash occurs mid-write
-* WAL write should happen before main file write (WAL = redo log)
-
-Implement at least one of:
-* atomic rename for main file
-* or check file integrity on load (validate JSON, check required fields), recover from WAL on invalid
-
-## 5. Persistence Guarantees to Test
-
-* After each successful insert/delete, killing and restarting (new CLI invocation) preserves that operation
-* Simulate crash during write: after truncating main file, WAL replay should recover (or at least status should detect corruption and not panic)
-* Save creates portable file, load recreates identical logical document
-* Save/load round-trip preserves format output exactly
-* Large document save/load works (1000+ elements)
-* Offline queue: operations performed while "offline" (if you implement explicit offline mode) are not lost
-
-## 6. New Files and Storage Layout
-
-Document your storage layout in a comment or README inside src:
-
-```
-.collab-doc/
-  <doc>.json         — main document state (atomic writes)
-  <doc>.wal          — write-ahead log (append-only, JSON lines or array)
-  <doc>.<client>.offline — optional per-client offline queue
+```text
+A edits offline
+→ A crashes
+→ A restarts
+→ B synchronizes
+→ B edits
+→ A synchronizes again
 ```
 
-Or equivalent. The tests use black-box CLI, so they don't assert file layout, but they will check that files exist and that recovery works.
+Also test repeated failures:
 
-## 7. Testing Requirements
+```text
+edit
+→ crash
+→ recover
+→ sync
+→ edit
+→ crash
+→ recover
+→ sync
+```
 
-Extend test suite with:
+The system must continue to converge.
 
-* save creates file and returns 0
-* load recreates document with same format output
-* save/load round-trip preserves element count and ordering
-* save/load preserves client clocks (if status includes client info, verify after round-trip)
-* crash recovery: perform ops, forcefully keep WAL with extra op not yet checkpointed (simulated by directly writing to WAL file in test), then run status/format and verify recovery
-* atomic write simulation: concurrent CLI invocations don't corrupt document (run two inserts in parallel from different processes, final doc should have both or at least not be corrupted JSON)
-* offline queue: if implemented, queue ops while offline and verify they appear after sync
-* load overwrites existing doc or merges appropriately — define and test
-* save of large doc (500+ elements) and load succeeds
-* error cases: save non-existent doc returns non-zero, load non-existent file returns non-zero
-* format after save/load equals format before
+## 9. Repeated Synchronization
 
-## 8. Completion Criteria
+Synchronization may be interrupted at any point.
 
-* WAL file written for each operation and replayed on startup
-* save and load commands implemented with correct exit codes
-* save/load round-trip preserves logical document content
-* Atomic writes prevent corruption on crash (rename pattern)
-* Recovery from WAL on startup works (or at least corruption detected gracefully)
-* Offline ops not lost (WAL serves as offline queue at minimum)
-* All previous milestones still pass
-* cargo build, cargo test pass
+A client may:
+
+* send the same operations repeatedly;
+* reconnect multiple times;
+* receive duplicate operations;
+* crash during synchronization;
+* restart and retry the same synchronization.
+
+The system must remain correct under all of these conditions.
+
+Running synchronization twice must not change the final document after the first successful synchronization.
+
+## 10. CLI Contract
+
+Extend the existing CLI with:
+
+### `offline`
+
+Mark a client as disconnected from synchronization.
+
+```text
+collab-doc offline <document> --client <client-id>
+```
+
+### `online`
+
+Reconnect a client.
+
+```text
+collab-doc online <document> --client <client-id>
+```
+
+### `recover`
+
+Explicitly recover a client's persistent state.
+
+```text
+collab-doc recover <document> --client <client-id>
+```
+
+Recovery should normally happen automatically when necessary, but this command must provide a way to invoke and test recovery explicitly.
+
+### `sync`
+
+The existing synchronization command must continue to work after offline periods and process restarts:
+
+```text
+collab-doc sync <document> --from <client-id> --to <client-id>
+```
+
+Do not change the existing command names or previously defined flags.
+
+## 11. Persistence Testing
+
+Create tests that repeatedly:
+
+1. create a document;
+2. perform operations;
+3. terminate the process;
+4. start a fresh process;
+5. inspect the state;
+6. continue editing;
+7. synchronize;
+8. verify convergence.
+
+Use separate subprocesses for important black-box tests so that the implementation cannot accidentally rely on process-local memory.
+
+Include tests involving large numbers of operations.
+
+## 12. Randomized Failure Testing
+
+Create randomized tests that combine:
+
+* local edits;
+* offline periods;
+* synchronization;
+* duplicate operations;
+* message reordering;
+* client restarts;
+* synchronization-store restarts;
+* crashes at persistence boundaries.
+
+For each workload, eventually reconnect the clients and allow synchronization to complete.
+
+Verify that:
+
+* no durable operation is silently lost;
+* documents remain internally consistent;
+* clients eventually converge;
+* repeated recovery does not change the logical state.
+
+When a randomized test fails, reduce it to a reproducible sequence, identify the violated invariant, fix the underlying problem, and add a regression test.
+
+## Acceptance Criteria
+
+The milestone is complete only when:
+
+1. Clients can edit documents while offline.
+2. Offline edits survive client restarts.
+3. Synchronization works after arbitrary offline periods.
+4. Persistent synchronization state survives process termination.
+5. Durably recorded operations survive synchronization-store restarts.
+6. Recovery correctly handles crashes at persistence boundaries.
+7. Replaying recovered operations does not corrupt state.
+8. Repeated synchronization remains idempotent.
+9. Existing synchronization and document behavior continues to work.
+10. Required CLI commands and flags are implemented.
+11. Black-box subprocess tests pass.
+12. Randomized failure tests pass.
+13. Crash-injection tests pass.
+14. No durable operation is silently lost.
+15. No test is disabled or weakened to hide a failure.
+
+Before finishing, run:
+
+```text
+cargo build --release
+cargo test
+```
+
+and run the complete black-box CLI test suite using fresh processes.
+
+Provide a concise final report describing the implementation, recovery strategy, tests performed, and any remaining issues.

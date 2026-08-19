@@ -26,9 +26,9 @@ enum Commands {
         document: String,
         #[arg(long)]
         id: String,
-        #[arg(long)]
+        #[arg(long, allow_hyphen_values = true)]
         value: String,
-        #[arg(long)]
+        #[arg(long, allow_hyphen_values = true)]
         after: Option<String>,
         #[arg(long)]
         client: Option<String>,

@@ -145,12 +145,35 @@ def test_save_load_preserves_undo(workdir):
     run_ok(["new", "doc"], cwd=workdir)
     run_ok(["insert", "doc", "--id", "a", "--value", "A", "--client", "alice"], cwd=workdir)
     run_ok(["insert", "doc", "--id", "b", "--value", "B", "--client", "alice", "--after", "a"], cwd=workdir)
+    # undo removes B, so doc has only A
+    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
+    r_before = run_ok(["format", "doc"], cwd=workdir)
+    assert r_before.stdout.strip() == "A"
+    # verify undo/redo stacks before save
+    doc_json = pathlib.Path(workdir) / ".collab-doc" / "doc.json"
+    if doc_json.exists():
+        data = json.load(open(doc_json))
+        assert "alice" in data.get("undo_stacks", {}) and len(data["undo_stacks"]["alice"]) >= 1
+        assert "alice" in data.get("redo_stacks", {}) and len(data["redo_stacks"]["alice"]) >= 1
     snap = os.path.join(workdir, "snap.json")
     run_ok(["save", "doc", "--path", snap], cwd=workdir)
     run_ok(["load", "--path", snap, "--doc-id", "doc2"], cwd=workdir)
-    # After load, try undo - if preserved, should work, if not, should fail gracefully not panic
-    r = run(["undo", "doc2", "--client", "alice"], cwd=workdir)
-    assert r.returncode in [0,1]
+    # loaded doc must have same format
+    r_loaded = run_ok(["format", "doc2"], cwd=workdir)
+    assert r_loaded.stdout == r_before.stdout
+    # undo history must be preserved and usable - second undo must succeed (removes A)
+    r = run_ok(["undo", "doc2", "--client", "alice"], cwd=workdir)
+    assert r.returncode == 0
+    r_after_undo = run_ok(["format", "doc2"], cwd=workdir)
+    assert r_after_undo.stdout.strip() == ""
+    # redo must restore A
+    run_ok(["redo", "doc2", "--client", "alice"], cwd=workdir)
+    r_after_redo = run_ok(["format", "doc2"], cwd=workdir)
+    assert "A" in r_after_redo.stdout
+    # redo again must restore B
+    run_ok(["redo", "doc2", "--client", "alice"], cwd=workdir)
+    r_final = run_ok(["format", "doc2"], cwd=workdir)
+    assert "A" in r_final.stdout and "B" in r_final.stdout
 
 def test_undo_redo_multiple(workdir):
     run_ok(["new", "doc"], cwd=workdir)
@@ -168,3 +191,76 @@ def test_undo_redo_multiple(workdir):
     run_ok(["redo", "doc", "--client", "alice"], cwd=workdir)
     r = run_ok(["format", "doc"], cwd=workdir)
     assert "v0" in r.stdout and "v2" in r.stdout
+
+# --- Realistic undo/redo/perf with rich text ---
+
+def test_undo_redo_rich_text(workdir):
+    run_ok(["new", "doc"], cwd=workdir)
+    run_ok(["insert", "doc", "--id", "h1", "--value", "# Title **bold** *italic*", "--client", "alice"], cwd=workdir)
+    run_ok(["insert", "doc", "--id", "p1", "--value", "Paragraph **important** *note* `code`", "--client", "alice", "--after", "h1"], cwd=workdir)
+    run_ok(["insert", "doc", "--id", "h2", "--value", "## Subtitle *detail* **key**", "--client", "alice", "--after", "p1"], cwd=workdir)
+    r = run_ok(["format", "doc"], cwd=workdir)
+    assert "# Title" in r.stdout
+    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
+    r = run_ok(["format", "doc"], cwd=workdir)
+    assert "Subtitle" not in r.stdout
+    run_ok(["redo", "doc", "--client", "alice"], cwd=workdir)
+    r = run_ok(["format", "doc"], cwd=workdir)
+    assert "Subtitle" in r.stdout
+
+def test_realistic_trace_undo_redo_interleaved(workdir):
+    # 60 ops across alice/bob then undo/redo sequences
+    import random
+    random.seed(99)
+    run_ok(["new", "doc"], cwd=workdir)
+    ids=[]
+    for i in range(60):
+        client = "alice" if i%2==0 else "bob"
+        eid = f"e{i}"
+        val = f"Line {i} **bold {i}** *italic*" if i%5==0 else f"value {i}"
+        after = ids[-1] if ids else None
+        args = ["insert", "doc", "--id", eid, "--value", val, "--client", client]
+        if after:
+            args += ["--after", after]
+        run_ok(args, cwd=workdir)
+        ids.append(eid)
+    # undo 5 from alice - handle dependents: leaf order bob->alice, so undo bob first if needed
+    for client in ["bob", "alice", "bob", "alice", "bob"]:
+        r_undo = run(["undo", "doc", "--client", client], cwd=workdir)
+        # allow dependent error, but at least one undo should succeed
+        if r_undo.returncode != 0:
+            assert "dependents" in r_undo.stderr.lower() or "no operation" in r_undo.stderr.lower(), f"unexpected undo fail: {r_undo.stderr}"
+    r = run_ok(["status", "doc"], cwd=workdir)
+    # should have fewer elements
+    assert "elements:" in r.stdout
+    # redo - handle partial undos: redo as many as succeeded
+    for client in ["bob", "alice", "bob", "alice"]:
+        r_redo = run(["redo", "doc", "--client", client], cwd=workdir)
+        if r_redo.returncode != 0:
+            assert "no operations" in r_redo.stderr.lower() or "no operation" in r_redo.stderr.lower(), f"unexpected redo fail: {r_redo.stderr}"
+            break
+    r = run_ok(["format", "doc"], cwd=workdir)
+    # i=0 creates Line 0, not value 0; check either
+    assert "value 0" in r.stdout or "Line 0" in r.stdout or "value 1" in r.stdout
+
+def test_large_doc_performance_realistic_2000(workdir):
+    import time
+    run_ok(["new", "doc"], cwd=workdir)
+    n=2000
+    start=time.time()
+    for i in range(n):
+        after = f"e{i-1}" if i>0 else None
+        val = f"# Heading {i} **bold**" if i%200==0 else f"line {i} **b** *i* content longer realistic text {i}"
+        args = ["insert", "doc", "--id", f"e{i}", "--value", val]
+        if after:
+            args += ["--after", after]
+        run_ok(args, cwd=workdir)
+    elapsed=time.time()-start
+    assert elapsed < 30, f"2000 inserts took {elapsed}s"
+    r=run_ok(["format", "doc"], cwd=workdir)
+    assert f"line {n-1}" in r.stdout
+    # gc preserves
+    r1=run_ok(["format", "doc"], cwd=workdir)
+    run_ok(["gc", "doc"], cwd=workdir)
+    r2=run_ok(["format", "doc"], cwd=workdir)
+    assert r1.stdout==r2.stdout
