@@ -71,7 +71,22 @@
     "tests/test_5_adversarial_hardening.py::test_gc_safety_under_load",
     "tests/test_5_adversarial_hardening.py::test_verify_after_gc",
     "tests/test_5_adversarial_hardening.py::test_idempotent_ops_during_storm",
-    "tests/test_5_adversarial_hardening.py::test_undo_redo_under_concurrency"
+    "tests/test_5_adversarial_hardening.py::test_undo_redo_under_concurrency",
+    "tests/test_6_strict_requirements.py::test_wal_replay_after_doc_deletion_restores",
+    "tests/test_6_strict_requirements.py::test_wal_replay_skips_corrupted_line_and_warns",
+    "tests/test_6_strict_requirements.py::test_wal_replay_idempotent_double",
+    "tests/test_6_strict_requirements.py::test_wal_ordering_preserved",
+    "tests/test_6_strict_requirements.py::test_save_load_undo_history_strict",
+    "tests/test_6_strict_requirements.py::test_save_load_redo_only_strict",
+    "tests/test_6_strict_requirements.py::test_vector_clock_monotonic",
+    "tests/test_6_strict_requirements.py::test_vector_clock_multi_client_causal",
+    "tests/test_6_strict_requirements.py::test_vector_clock_preserved_across_save_load",
+    "tests/test_6_strict_requirements.py::test_operation_id_collision_rejected_via_wal",
+    "tests/test_6_strict_requirements.py::test_element_id_collision_rejected_strict",
+    "tests/test_6_strict_requirements.py::test_byzantine_wal_corruption_warning",
+    "tests/test_6_strict_requirements.py::test_byzantine_corrupted_snapshot_rejected",
+    "tests/test_6_strict_requirements.py::test_byzantine_truncated_doc_recovery",
+    "tests/test_6_strict_requirements.py::test_byzantine_duplicate_order_handled"
   ],
   "pass_to_pass": [],
   "selected_test_files_to_run": [
@@ -79,7 +94,8 @@
     "tests/test_2_multi_client_sync.py",
     "tests/test_3_offline_crash_recovery.py",
     "tests/test_4_undo_redo_performance.py",
-    "tests/test_5_adversarial_hardening.py"
+    "tests/test_5_adversarial_hardening.py",
+    "tests/test_6_strict_requirements.py"
   ],
   "before_repo_set_cmd": "",
   "patch": "diff --git a/.placeholder b/.placeholder\nnew file mode 100644\nindex 0000000..a3d8f7e\n--- /dev/null\n+++ b/.placeholder\n@@ -0,0 +1 @@\n+# placeholder for greenfield task\n",

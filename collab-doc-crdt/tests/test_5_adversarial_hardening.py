@@ -66,7 +66,7 @@ def test_verify_detects_missing_ref(workdir):
             r3 = run(["format", "doc"], cwd=workdir)
             # at least one should indicate issue (non-zero or filtered)
             # If format still succeeds but filters missing ID, that's also acceptable as graceful handling
-            assert r.returncode != 0 or r2.returncode != 0 or "nonexistent" not in r3.stdout or True  # allow graceful handling
+            assert r.returncode != 0 or r2.returncode != 0 or "nonexistent" not in r3.stdout
 
 def test_path_traversal_blocked(workdir):
     run_fail(["new", "../../tmp/evil"], cwd=workdir)
@@ -81,17 +81,21 @@ def test_path_traversal_blocked(workdir):
 def test_wal_corruption_handled(workdir):
     run_ok(["new", "doc"], cwd=workdir)
     run_ok(["insert", "doc", "--id", "a", "--value", "A"], cwd=workdir)
+    r_before = run_ok(["format", "doc"], cwd=workdir)
+    assert "A" in r_before.stdout
     wal_path = pathlib.Path(workdir) / ".collab-doc" / "doc.wal"
     if wal_path.exists():
         with open(wal_path, "a") as f:
             f.write("INVALID JSON LINE\n")
             f.write("{ invalid json\n")
-        r = run(["status", "doc"], cwd=workdir)
-        # should not panic, return 0 or 1 gracefully
-        assert r.returncode in [0,1]
-        # format should still work (ignoring bad WAL lines)
-        r = run(["format", "doc"], cwd=workdir)
-        assert r.returncode in [0,1]
+        # must not panic - status must still succeed and preserve document
+        r = run_ok(["status", "doc"], cwd=workdir)
+        assert r.returncode == 0
+        assert "elements: 1" in r.stdout.lower()
+        r_fmt = run_ok(["format", "doc"], cwd=workdir)
+        assert r_fmt.returncode == 0
+        assert "A" in r_fmt.stdout
+        assert r_fmt.stdout == r_before.stdout
 
 def test_large_value(workdir):
     run_ok(["new", "doc"], cwd=workdir)
@@ -244,3 +248,67 @@ def test_undo_redo_under_concurrency(workdir):
     run_ok(["redo", "doc", "--client", "alice"], cwd=workdir)
     r = run_ok(["format", "doc"], cwd=workdir)
     assert "A" in r.stdout and "B" in r.stdout
+
+# --- Realistic adversarial: large concurrent storm with rich text ---
+def test_concurrent_storm_realistic_100_ops(workdir):
+    import tempfile, shutil, random
+    def run_storm():
+        d=tempfile.mkdtemp()
+        run_ok(["new", "doc"], cwd=d)
+        run_ok(["insert", "doc", "--id", "base", "--value", "# Base **heading** *italic*"], cwd=d)
+        ops=[]
+        for client in ["alice","bob","carol","dave"]:
+            for j in range(25):
+                eid=f"{client}_{j}"
+                # realistic rich text
+                if j%5==0:
+                    val=f"## Heading {client} {j} **bold** *italic*"
+                elif j%5==1:
+                    val=f"- **Task {j}** *{client}* `code`"
+                elif j%5==2:
+                    val=f"> Quote {j} *{client}* **important**"
+                elif j%5==3:
+                    val=f"```code {j} {client}``` **result**"
+                else:
+                    val=f"Paragraph {j} {client} **bold** *italic* lorem {j}"
+                ops.append((client,eid,val))
+        random.seed(42)
+        random.shuffle(ops)
+        for client,eid,val in ops:
+            run_ok(["insert", "doc", "--id", eid, "--value", val, "--client", client, "--after", "base"], cwd=d)
+        run_ok(["merge", "doc", "--clients", "alice,bob,carol,dave"], cwd=d)
+        r=run_ok(["format", "doc"], cwd=d)
+        out=r.stdout
+        shutil.rmtree(d)
+        return out
+    outs=[run_storm() for _ in range(3)]
+    assert all(x==outs[0] for x in outs)
+    # verify realistic markers present
+    assert "## Heading" in outs[0] or "**Task" in outs[0]
+
+def test_many_clients_rich_text_50(workdir):
+    run_ok(["new", "doc"], cwd=workdir)
+    for i in range(50):
+        client=f"client{i%10}"
+        val=f"Value {i} **bold {i}** *italic {i}* # heading" if i%10==0 else f"v{i} **b** *i*"
+        run_ok(["insert", "doc", "--id", f"e{i}", "--value", val, "--client", client], cwd=workdir)
+    r=run_ok(["status", "doc"], cwd=workdir)
+    assert "clients" in r.stdout.lower()
+    clients=",".join([f"client{i}" for i in range(10)])
+    run_ok(["merge", "doc", "--clients", clients], cwd=workdir)
+    r=run_ok(["format", "doc"], cwd=workdir)
+    assert "v0" in r.stdout and "v49" in r.stdout
+
+def test_verify_with_realistic_corpus(workdir):
+    import pathlib, json as _json
+    run_ok(["new", "doc"], cwd=workdir)
+    for i in range(30):
+        val=f"Line {i} **bold** *italic* # heading {i}" if i%5==0 else f"value {i}"
+        after=f"e{i-1}" if i>0 else None
+        args=["insert", "doc", "--id", f"e{i}", "--value", val]
+        if after:
+            args+=["--after", after]
+        run_ok(args, cwd=workdir)
+    r=run_ok(["verify", "doc"], cwd=workdir)
+    assert r.returncode==0
+    assert "OK" in r.stdout
