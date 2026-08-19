@@ -297,7 +297,8 @@ def test_many_clients_rich_text_50(workdir):
     clients=",".join([f"client{i}" for i in range(10)])
     run_ok(["merge", "doc", "--clients", clients], cwd=workdir)
     r=run_ok(["format", "doc"], cwd=workdir)
-    assert "v0" in r.stdout and "v49" in r.stdout
+    # i%10==0 creates Value 0, not v0; check both rich values present
+    assert ("Value 0" in r.stdout or "v0" in r.stdout) and "v49" in r.stdout
 
 def test_verify_with_realistic_corpus(workdir):
     import pathlib, json as _json

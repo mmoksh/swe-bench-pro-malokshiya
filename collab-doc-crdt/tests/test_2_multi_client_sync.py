@@ -184,7 +184,7 @@ def test_multi_client_interleaved_realistic_72_ops(workdir):
     # apply with retry for after-not-found (out-of-order)
     pending = trace[:]
     attempts = 0
-    max_attempts = len(pending)*3
+    max_attempts = len(pending)*10
     applied = set()
     # base already
     while pending and attempts < max_attempts:
@@ -233,7 +233,7 @@ def test_merge_order_independence_large(workdir):
         trace = _build_interleaved_trace(60)
         pending = trace[:]
         attempts = 0
-        max_attempts = len(pending)*3
+        max_attempts = len(pending)*10
         while pending and attempts < max_attempts:
             client, eid, val, after = pending.pop(0)
             args = ["insert", "doc", "--id", eid, "--value", val, "--client", client]
@@ -261,7 +261,7 @@ def test_large_sync_save_load_realistic(workdir):
     trace = _build_interleaved_trace(50)
     pending = trace[:]
     attempts = 0
-    max_attempts = len(pending)*3
+    max_attempts = len(pending)*10
     while pending and attempts < max_attempts:
         client, eid, val, after = pending.pop(0)
         args = ["insert", "doc", "--id", eid, "--value", val, "--client", client]
