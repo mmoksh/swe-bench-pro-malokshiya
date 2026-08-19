@@ -1,8 +1,0 @@
-{
-  "id": "4",
-  "subject": "Create test/utils.proxyPool.js",
-  "description": "Unit tests covering round-robin, failure disabling, cooldown, exponential backoff, recovery, and concurrent-failure scenarios.",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

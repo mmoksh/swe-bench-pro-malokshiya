@@ -1,9 +1,0 @@
-{
-  "id": "2",
-  "subject": "Integrate ProxyPool with request layer",
-  "description": "Modify lib/utils/request.js to accept a proxyPool option, use it to route requests through proxies, and report success/failure.",
-  "activeForm": "Integrating with request layer",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

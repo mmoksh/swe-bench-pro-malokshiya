@@ -1,9 +1,0 @@
-{
-  "id": "4",
-  "subject": "Write unit tests for ProxyPool",
-  "description": "Create test/utils.proxyPool.js with tests for rotation, failure handling, cooldown, recovery, and edge cases",
-  "activeForm": "Writing ProxyPool tests",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

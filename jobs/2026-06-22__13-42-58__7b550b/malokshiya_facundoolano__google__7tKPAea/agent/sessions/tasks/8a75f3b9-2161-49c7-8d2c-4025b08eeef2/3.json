@@ -1,9 +1,0 @@
-{
-  "id": "3",
-  "subject": "Write tests for ReviewSync",
-  "description": "Unit tests covering: first sync (no checkpoint), incremental sync (with checkpoint), deduplication, early stopping, empty results, out-of-order handling.",
-  "activeForm": "Writing ReviewSync tests",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

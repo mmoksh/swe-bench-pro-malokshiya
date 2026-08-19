@@ -1,9 +1,0 @@
-{
-  "id": "2",
-  "subject": "Integrate ProxyPool with request.js",
-  "description": "Update lib/utils/request.js to accept a proxyPool option, automatically select a proxy per request, and report success/failure back to the pool.",
-  "activeForm": "Integrating ProxyPool with request module",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

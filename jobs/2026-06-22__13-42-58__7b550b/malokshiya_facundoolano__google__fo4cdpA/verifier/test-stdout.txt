@@ -1,7 +1,0 @@
-Applying test_patch from config.json
-Required tests: 7
-Passed tests: 2
-Required tests that passed: 2
-
-RESULT: FAILED
-Missing tests: ['ReviewSync should deduplicate reviews with same id', 'ReviewSync should return existing checkpoint when no new reviews found', 'ReviewSync should fetch all reviews on first run (no checkpoint)', 'ReviewSync should fetch only new reviews when checkpoint is provided', 'ReviewSync should return reviews sorted by timestamp descending']

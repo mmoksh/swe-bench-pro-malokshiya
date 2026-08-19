@@ -1,8 +1,0 @@
-{
-  "id": "1",
-  "subject": "Create lib/proxyPool.js",
-  "description": "ProxyConfig and ProxyPool classes with round-robin rotation, failure tracking, exponential backoff cooldown, and recovery.",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

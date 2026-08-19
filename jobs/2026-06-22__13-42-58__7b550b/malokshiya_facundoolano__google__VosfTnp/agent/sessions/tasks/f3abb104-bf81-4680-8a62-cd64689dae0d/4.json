@@ -1,9 +1,0 @@
-{
-  "id": "4",
-  "subject": "Write unit tests",
-  "description": "Test first sync, incremental sync, early stopping, dedup, out-of-order, boundary cases",
-  "activeForm": "Writing unit tests",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

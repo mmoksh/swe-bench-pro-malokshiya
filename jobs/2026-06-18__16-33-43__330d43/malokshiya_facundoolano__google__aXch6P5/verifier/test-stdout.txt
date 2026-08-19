@@ -1,8 +1,0 @@
-Running gold tests checkout: git clean -fd
-Removing solution_patch.diff
-Applying test_patch from config.json
-Required tests: 6
-Passed tests: 6
-Required tests that passed: 6
-
-RESULT: PASSED

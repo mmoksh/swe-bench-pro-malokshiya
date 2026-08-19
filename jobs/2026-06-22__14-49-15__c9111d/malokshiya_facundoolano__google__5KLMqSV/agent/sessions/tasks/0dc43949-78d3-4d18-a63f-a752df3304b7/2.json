@@ -1,8 +1,0 @@
-{
-  "id": "2",
-  "subject": "Export ProxyPool from index.js",
-  "description": "Add ProxyPool to the package entry point so it's accessible as gplay.ProxyPool.",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

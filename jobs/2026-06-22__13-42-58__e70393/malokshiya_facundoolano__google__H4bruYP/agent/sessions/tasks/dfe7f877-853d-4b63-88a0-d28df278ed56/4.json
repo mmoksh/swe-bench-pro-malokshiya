@@ -1,9 +1,0 @@
-{
-  "id": "4",
-  "subject": "Update TypeScript declarations",
-  "description": "Add ProxyConfig, ProxyPoolOptions, and ProxyPool types to index.d.ts. Add proxyPool to IOptions.",
-  "activeForm": "Updating TypeScript types",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

@@ -1,8 +1,0 @@
-{
-  "id": "3",
-  "subject": "Add TypeScript declarations to index.d.ts",
-  "description": "Add ProxyPool and ProxyConfig class declarations and update defaultExport.",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

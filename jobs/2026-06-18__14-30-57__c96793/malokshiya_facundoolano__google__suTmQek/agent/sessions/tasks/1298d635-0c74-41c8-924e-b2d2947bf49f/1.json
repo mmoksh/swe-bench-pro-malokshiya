@@ -1,8 +1,0 @@
-{
-  "id": "1",
-  "subject": "Apply search function fix from commit e6bea61",
-  "description": "Apply the fix from commit e6bea61 to lib/search.js: URL change, new data key (ds:4), updated section/app mappings, and exact-match handling.",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}

@@ -1,9 +1,0 @@
-{
-  "id": "5",
-  "subject": "Run tests and verify everything passes",
-  "description": "Run the test suite to confirm ProxyPool works correctly",
-  "activeForm": "Running tests",
-  "status": "completed",
-  "blocks": [],
-  "blockedBy": []
-}
