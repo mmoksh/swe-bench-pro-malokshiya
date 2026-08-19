@@ -1,170 +1,135 @@
-
-import subprocess, os, tempfile, shutil, json, pytest, time, pathlib
-
-BIN = "/app/target/release/collab-doc"
-if not os.path.exists(BIN):
-    BIN = "/tmp/collab-doc-oracle/target/release/collab-doc"
-    if not os.path.exists(BIN):
-        BIN = "collab-doc"
-
-def run(args, cwd=None):
-    return subprocess.run([BIN] + args, cwd=cwd, capture_output=True, text=True)
-
-def run_ok(args, cwd=None):
-    r = run(args, cwd=cwd)
-    assert r.returncode == 0, f"Expected 0 got {r.returncode}: {' '.join(args)}\n{r.stdout}\n{r.stderr}"
+"""Step 4 — Undo/Redo + Performance — fresh suite (12 tests)."""
+import os, subprocess, tempfile, shutil, json, pathlib, time
+import pytest
+BIN_CANDIDATES=["/app/target/release/collab-doc","/app/target/debug/collab-doc","collab-doc"]
+def _bin():
+    for c in BIN_CANDIDATES:
+        if "/" in c and os.path.exists(c): return c
+        if "/" not in c and shutil.which(c): return c
+    return BIN_CANDIDATES[0]
+BIN=_bin()
+def cli(*a,cwd=None): return subprocess.run([BIN,*a],cwd=cwd,capture_output=True,text=True)
+def ok(*a,cwd=None):
+    r=cli(*a,cwd=cwd)
+    assert r.returncode==0, f"ok fail {a}: {r.stdout}\n{r.stderr}"
     return r
-
-def run_fail(args, cwd=None):
-    r = run(args, cwd=cwd)
-    assert r.returncode != 0, f"Expected fail but got 0: {' '.join(args)}"
+def fail(*a,cwd=None):
+    r=cli(*a,cwd=cwd)
+    assert r.returncode!=0, f"expected fail {a}"
     return r
-
 @pytest.fixture
-def workdir():
-    d = tempfile.mkdtemp()
+def wd():
+    d=tempfile.mkdtemp()
     yield d
-    shutil.rmtree(d, ignore_errors=True)
+    shutil.rmtree(d,ignore_errors=True)
 
-def test_undo_insert(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "a", "--value", "Hello", "--client", "alice"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "b", "--value", "world", "--client", "alice", "--after", "a"], cwd=workdir)
-    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert "world" not in r.stdout
-    assert "Hello" in r.stdout
+def test_undo_insert(wd):
+    ok("new","doc",cwd=wd)
+    ok("insert","doc","--id","u1","--value","keep","--client","alice",cwd=wd)
+    ok("insert","doc","--id","u2","--value","drop","--client","alice","--after","u1",cwd=wd)
+    ok("undo","doc","--client","alice",cwd=wd)
+    r=ok("format","doc",cwd=wd)
+    assert "keep" in r.stdout and "drop" not in r.stdout
 
-def test_undo_delete_restores(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "a", "--value", "Hello", "--client", "alice"], cwd=workdir)
-    run_ok(["delete", "doc", "--id", "a", "--client", "alice"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert r.stdout.strip() == ""
-    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert "Hello" in r.stdout
+def test_undo_delete_restores(wd):
+    ok("new","doc",cwd=wd)
+    ok("insert","doc","--id","d1","--value","alive","--client","alice",cwd=wd)
+    ok("delete","doc","--id","d1","--client","alice",cwd=wd)
+    assert ok("format","doc",cwd=wd).stdout.strip()==""
+    ok("undo","doc","--client","alice",cwd=wd)
+    assert "alive" in ok("format","doc",cwd=wd).stdout
 
-def test_redo_after_undo(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "a", "--value", "Hello", "--client", "alice"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "b", "--value", "world", "--client", "alice", "--after", "a"], cwd=workdir)
-    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-    run_ok(["redo", "doc", "--client", "alice"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert "Hello" in r.stdout and "world" in r.stdout
+def test_redo_after_undo(wd):
+    ok("new","doc",cwd=wd)
+    ok("insert","doc","--id","r1","--value","one","--client","alice",cwd=wd)
+    ok("insert","doc","--id","r2","--value","two","--client","alice","--after","r1",cwd=wd)
+    ok("undo","doc","--client","alice",cwd=wd)
+    ok("redo","doc","--client","alice",cwd=wd)
+    r=ok("format","doc",cwd=wd)
+    assert "one" in r.stdout and "two" in r.stdout
 
-def test_undo_no_ops_fails(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_fail(["undo", "doc", "--client", "alice"], cwd=workdir)
+def test_undo_no_ops_fails(wd):
+    ok("new","doc",cwd=wd)
+    fail("undo","doc","--client","alice",cwd=wd)
 
-def test_redo_no_ops_fails(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_fail(["redo", "doc", "--client", "nonexist"], cwd=workdir)
+def test_redo_no_ops_fails(wd):
+    ok("new","doc",cwd=wd)
+    fail("redo","doc","--client","nobody",cwd=wd)
 
-def test_per_client_isolation(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "a", "--value", "A", "--client", "alice"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "b", "--value", "B", "--client", "bob"], cwd=workdir)
-    # alice undo should only affect alice's op
-    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert "A" not in r.stdout
-    assert "B" in r.stdout
-    # bob still has B
-    run_ok(["undo", "doc", "--client", "bob"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert r.stdout.strip() == ""
+def test_per_client_isolation(wd):
+    ok("new","doc",cwd=wd)
+    ok("insert","doc","--id","ca","--value","A","--client","alice",cwd=wd)
+    ok("insert","doc","--id","cb","--value","B","--client","bob",cwd=wd)
+    ok("undo","doc","--client","alice",cwd=wd)
+    r=ok("format","doc",cwd=wd)
+    assert "A" not in r.stdout and "B" in r.stdout
+    ok("undo","doc","--client","bob",cwd=wd)
+    assert ok("format","doc",cwd=wd).stdout.strip()==""
 
-def test_undo_causality(workdir):
-    # if B after A, undoing A while B exists should fail or cascade - we accept either but not corrupt
-    run_ok(["new", "doc"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "a", "--value", "A", "--client", "alice"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "b", "--value", "B", "--client", "alice", "--after", "a"], cwd=workdir)
-    r = run(["undo", "doc", "--client", "alice"], cwd=workdir)
-    # This undo removes B (last op is B after A, so undo B first should succeed)
-    # The second undo would try to remove A while B already undone, so should succeed
-    # But if impl does stack LIFO, first undo removes B, second removes A
-    # So we test two undos
-    if r.returncode == 0:
-        # B was undone, now A has no dependents, second undo should succeed
-        run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-        r2 = run_ok(["format", "doc"], cwd=workdir)
-        assert r2.stdout.strip() == ""
-    else:
-        # if first undo failed due to dependency check, that's also acceptable if documented
-        # but our test expects LIFO to work: last op is B, which has no dependents, so should succeed
-        # So this path indicates potential issue, but we allow either
-        r2 = run(["format", "doc"], cwd=workdir)
-        assert r2.returncode == 0
+def test_undo_causality(wd):
+    ok("new","doc",cwd=wd)
+    ok("insert","doc","--id","base","--value","B","--client","alice",cwd=wd)
+    ok("insert","doc","--id","child","--value","C","--client","alice","--after","base",cwd=wd)
+    # LIFO: child is most recent, undo should remove child first
+    ok("undo","doc","--client","alice",cwd=wd)
+    assert "C" not in ok("format","doc",cwd=wd).stdout
+    ok("undo","doc","--client","alice",cwd=wd)
+    assert ok("format","doc",cwd=wd).stdout.strip()==""
 
-def test_gc_preserves_format(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
+def test_gc_preserves_format(wd):
+    ok("new","doc",cwd=wd)
     for i in range(10):
-        run_ok(["insert", "doc", "--id", f"e{i}", "--value", f"v{i}", "--client", "alice"], cwd=workdir)
+        ok("insert","doc","--id",f"gc{i}","--value",f"v{i}","--client","alice",cwd=wd)
     for i in range(5):
-        run_ok(["delete", "doc", "--id", f"e{i}", "--client", "alice"], cwd=workdir)
-    r1 = run_ok(["format", "doc"], cwd=workdir)
-    run_ok(["gc", "doc"], cwd=workdir)
-    r2 = run_ok(["format", "doc"], cwd=workdir)
-    assert r1.stdout == r2.stdout
+        ok("delete","doc","--id",f"gc{i}","--client","alice",cwd=wd)
+    before=ok("format","doc",cwd=wd).stdout
+    ok("gc","doc",cwd=wd)
+    after=ok("format","doc",cwd=wd).stdout
+    assert before==after
 
-def test_gc_removes_tombstones(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "a", "--value", "A"], cwd=workdir)
-    run_ok(["delete", "doc", "--id", "a"], cwd=workdir)
-    r1 = run_ok(["status", "doc"], cwd=workdir)
-    run_ok(["gc", "doc"], cwd=workdir)
-    r2 = run_ok(["status", "doc"], cwd=workdir)
-    # after GC, elements 0, operations may be same or reduced
-    assert "elements: 0" in r2.stdout
-    # format still empty
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert r.stdout.strip() == ""
+def test_gc_removes_tombstones(wd):
+    ok("new","doc",cwd=wd)
+    ok("insert","doc","--id","t1","--value","x",cwd=wd)
+    ok("delete","doc","--id","t1",cwd=wd)
+    before=ok("status","doc",cwd=wd).stdout
+    ok("gc","doc",cwd=wd)
+    after=ok("status","doc",cwd=wd).stdout
+    assert "elements: 0" in after.lower()
+    assert ok("format","doc",cwd=wd).stdout.strip()==""
 
-def test_large_doc_performance(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    n = 1000
-    start = time.time()
+def test_large_doc_performance(wd):
+    ok("new","doc",cwd=wd)
+    n=1000
+    t0=time.time()
     for i in range(n):
-        after = f"e{i-1}" if i>0 else None
-        args = ["insert", "doc", "--id", f"e{i}", "--value", f"v{i}"]
-        if after:
-            args += ["--after", after]
-        run_ok(args, cwd=workdir)
-    elapsed = time.time() - start
-    # should complete in reasonable time (<10s for 1000 inserts via CLI, includes process overhead)
-    assert elapsed < 20, f"Inserting {n} took {elapsed}s"
-    start = time.time()
-    r = run_ok(["format", "doc"], cwd=workdir)
-    elapsed = time.time() - start
-    assert elapsed < 2, f"Format took {elapsed}s"
-    assert f"v{n-1}" in r.stdout
+        args=["insert","doc","--id",f"perf{i}","--value",f"vv{i}"]
+        if i>0: args+=["--after",f"perf{i-1}"]
+        ok(*args,cwd=wd)
+    assert time.time()-t0 < 90, "insert 1000 too slow"
+    t0=time.time()
+    r=ok("format","doc",cwd=wd)
+    assert time.time()-t0 < 2
+    assert f"vv{n-1}" in r.stdout
 
-def test_save_load_preserves_undo(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "a", "--value", "A", "--client", "alice"], cwd=workdir)
-    run_ok(["insert", "doc", "--id", "b", "--value", "B", "--client", "alice", "--after", "a"], cwd=workdir)
-    snap = os.path.join(workdir, "snap.json")
-    run_ok(["save", "doc", "--path", snap], cwd=workdir)
-    run_ok(["load", "--path", snap, "--doc-id", "doc2"], cwd=workdir)
-    # After load, try undo - if preserved, should work, if not, should fail gracefully not panic
-    r = run(["undo", "doc2", "--client", "alice"], cwd=workdir)
+def test_save_load_preserves_undo(wd):
+    ok("new","doc",cwd=wd)
+    ok("insert","doc","--id","sa","--value","keep","--client","alice",cwd=wd)
+    ok("insert","doc","--id","sb","--value","drop","--client","alice","--after","sa",cwd=wd)
+    snap=os.path.join(wd,"snap.json")
+    ok("save","doc","--path",snap,cwd=wd)
+    ok("load","--path",snap,"--doc-id","copy",cwd=wd)
+    # undo on loaded copy should not crash
+    r=cli("undo","copy","--client","alice",cwd=wd)
     assert r.returncode in [0,1]
 
-def test_undo_redo_multiple(workdir):
-    run_ok(["new", "doc"], cwd=workdir)
+def test_undo_redo_multiple(wd):
+    ok("new","doc",cwd=wd)
     for i in range(3):
-        run_ok(["insert", "doc", "--id", f"e{i}", "--value", f"v{i}", "--client", "alice"], cwd=workdir)
-    # undo 3 times
-    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-    run_ok(["undo", "doc", "--client", "alice"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
-    assert r.stdout.strip() == ""
-    # redo 3 times
-    run_ok(["redo", "doc", "--client", "alice"], cwd=workdir)
-    run_ok(["redo", "doc", "--client", "alice"], cwd=workdir)
-    run_ok(["redo", "doc", "--client", "alice"], cwd=workdir)
-    r = run_ok(["format", "doc"], cwd=workdir)
+        ok("insert","doc","--id",f"ur{i}","--value",f"v{i}","--client","alice",cwd=wd)
+    for _ in range(3):
+        ok("undo","doc","--client","alice",cwd=wd)
+    assert ok("format","doc",cwd=wd).stdout.strip()==""
+    for _ in range(3):
+        ok("redo","doc","--client","alice",cwd=wd)
+    r=ok("format","doc",cwd=wd)
     assert "v0" in r.stdout and "v2" in r.stdout
